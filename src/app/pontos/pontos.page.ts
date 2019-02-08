@@ -10,11 +10,12 @@ import { Ponto } from '../ponto';
 
 export class PontosPage implements OnInit {
   public pontos: Ponto[] = [];
-  constructor(public wspontos: WsPontosService) { }
+  constructor(public wspontos: WsPontosService) {  }
 
   ngOnInit(): void {
     this.wspontos.getPontos().subscribe(data => {
       this.pontos = data;
+      console.log(data);
     });
   }
 }

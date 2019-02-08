@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
     {
       title: 'Pontos',
       url: '/pontos',
-      icon: 'list'
+      icon: ''
     },
     {
       title: 'Ponto',
@@ -36,9 +36,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-//    this.wspontos.getPontos().subscribe(data => {
-//      this.pontos = data;
-//    });
   }
 
   initializeApp() {

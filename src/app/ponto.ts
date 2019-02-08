@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 
 export class Ponto {
-  constructor (_id, description, address, lat, lng, status, type) {
-    this._id = _id;
+  constructor (id, description, phone, address, lat, lng, status, type) {
+    this.id = id;
     this.description = description;
+    this.phone = phone;
     this.address = address;
     this.lat = lat;
     this.lng = lng;
@@ -11,15 +12,17 @@ export class Ponto {
     this.type = type;
   }
 
-  public _id: String;
-	public description: String;
+  public id: String;
+  public description: String;
+  public phone: String;
 	public address: String;
 	public lat: String;
 	public lng: String;
 	public status: String;
-  public type: any;
-  //public type: mongoose.Schema.Types.Mixed;
-
+  public type: {
+      id: String;
+      icon: String;
+  }
 }
 
 

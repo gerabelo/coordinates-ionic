@@ -11,14 +11,17 @@ export class WsPontosService implements OnInit {
 
   ngOnInit(){}
 
+  //public getPontos(): Observable<Ponto[]> {
   public getPontos(): Observable<Ponto[]> {
-    let httpParams = new HttpParams();
-    return this.http.get<Ponto[]>(`http://localhost:3000/list`, { params: httpParams });
+    return this.http.get<Ponto[]>('http://localhost:3000/coordinate/');
+    // this.http.get<Ponto[]>('http://localhost:3000/coordinate/').toPromise().then(data=>{
+    //   return data;
+    // });
   }
 
   public getPonto(): Observable<Ponto> {
     let httpParams = new HttpParams();
-    return this.http.get<Ponto>(`http://localhost:3000/show`, { params: httpParams });
+    return this.http.post<Ponto>('http://localhost:3000/coordinate', { params: httpParams });
   }
 
 }
