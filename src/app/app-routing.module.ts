@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { Ponto } from './ponto';
+import { PontoPage } from './ponto/ponto.page';
 
 const routes: Routes = [
   {
@@ -15,8 +17,14 @@ const routes: Routes = [
     path: 'list',
     loadChildren: './list/list.module#ListPageModule'
   },
-  { path: 'ponto', loadChildren: './ponto/ponto.module#PontoPageModule' },
-  { path: 'pontos', loadChildren: './pontos/pontos.module#PontosPageModule' }
+  { 
+    path: 'ponto/:id',
+    loadChildren: './ponto/ponto.module#PontoPageModule'
+  },
+  { 
+    path: 'pontos',
+    loadChildren: './pontos/pontos.module#PontosPageModule'
+  }
 ];
 
 @NgModule({

@@ -18,11 +18,6 @@ export class AppComponent implements OnInit {
       title: 'Pontos',
       url: '/pontos',
       icon: ''
-    },
-    {
-      title: 'Ponto',
-      url: '/ponto',
-      icon: ''
     }
   ];
 

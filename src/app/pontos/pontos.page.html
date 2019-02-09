@@ -1,17 +1,25 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Pontos</ion-title>
+    <ion-title>Cidade Coletiva</ion-title>
   </ion-toolbar>
 </ion-header>
-
 <ion-content padding>
     <ion-list>
-        <ion-item *ngFor="let ponto of pontos">
-          <ion-icon [name]="item.icon" slot="start"></ion-icon>
-          {{ponto.description}}
-          <div class="item-note" slot="end">
-            {{ponto.address}}
-          </div>
+        <ion-item *ngFor="let pt of pontos">
+          <!-- <a nav-transition="none" href="ponto/{{pt._id}}">
+            <ion-icon [name]="pt.type.icon" slot="start"></ion-icon>
+            {{pt.description}}
+            <div class="item-note" slot="end">
+              {{pt.address}}
+            </div>
+          </a> -->
+          <button ion-button icon-only (click)="getPonto(pt._id)">
+            <ion-icon [name]="pt.type.icon" slot="start"></ion-icon>
+            {{pt.description}}
+            <div class="item-note" slot="end">
+              {{pt.address}}
+            </div>
+          </button>
         </ion-item>
       </ion-list>
       <!--
