@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
-import { MenuController, NavController, NavParams } from '@ionic/angular';
-import { Observable } from 'rxjs';
-import { Router, ActivatedRoute, ParamMap } from '@angular/router';
-import { switchMap } from 'rxjs/operators';
-
+import { NavController } from '@ionic/angular';
+import { Router, ActivatedRoute } from '@angular/router';
+import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-ponto',
@@ -15,28 +13,25 @@ import { switchMap } from 'rxjs/operators';
 
 export class PontoPage implements OnInit {
   ponto: Ponto;
-  passedId: string;
+  faCompass = faCompass;
+  faInfoCircle = faInfoCircle;
+  faChevronCircleLeft = faChevronCircleLeft;
+  faMapMarker = faMapMarker;
+  faPhone = faPhone;
+  faRecycle = faRecycle;
+  faDesktop = faDesktop;
 
   constructor(
     public wspontos: WsPontosService,
     public navCtrl: NavController,
     private activatedRoute: ActivatedRoute,
-    private router: Router,
   ) { }
   ngOnInit() {
-    // this.ponto = this.activatedRoute.paramMap.pipe(
-    //   switchMap((params: ParamMap) => 
-    //     this.wspontos.getPonto(params.get('id'))      
-    //   )
-    // );
-    
-    //this.id = this.activatedRoute.snapshot.paramMap.get('id');
-    this.passedId = this.activatedRoute.snapshot.paramMap.get('id');
-    this.wspontos.getPonto(this.passedId).subscribe(data => {
+    this.wspontos.getPonto(this.activatedRoute.snapshot.paramMap.get('id')).subscribe(data => {
       this.ponto = data;
     });
-    
+  }
+  goback() {
+    this.navCtrl.navigateBack;
   }
 }
-
-

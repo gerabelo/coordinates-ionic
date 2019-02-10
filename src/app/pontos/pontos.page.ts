@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
 import { MenuController, NavController } from '@ionic/angular';
+import { faCompass, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-pontos',
@@ -11,7 +12,8 @@ import { MenuController, NavController } from '@ionic/angular';
 
 export class PontosPage implements OnInit {
   public pontos: Ponto[] = [];
-
+  faCompass = faCompass;
+  faInfoCircle = faInfoCircle;
 
   constructor(public wspontos: WsPontosService, public navCtrl: NavController) {  }
 
@@ -23,11 +25,6 @@ export class PontosPage implements OnInit {
   }
 
   getPonto(id: string) {
-    // this.wspontos.getPonto(id).subscribe(data => {
-    //   ponto = data;
-    //   console.log(ponto);
-    // });
-    //this.navCtrl.navigateForward('ponto/'+this.pontos.find(ponto => ponto.id === id));
     this.navCtrl.navigateForward('/ponto/'+id);
   }
 }

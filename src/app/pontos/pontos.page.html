@@ -1,27 +1,42 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Cidade Coletiva</ion-title>
-  </ion-toolbar>
+  <!-- <ion-toolbar>
+    <ion-title></ion-title>
+  </ion-toolbar> -->
 </ion-header>
-<ion-content padding>
-    <ion-list>
-        <ion-item *ngFor="let pt of pontos">
-          <!-- <a nav-transition="none" href="ponto/{{pt._id}}">
-            <ion-icon [name]="pt.type.icon" slot="start"></ion-icon>
-            {{pt.description}}
-            <div class="item-note" slot="end">
-              {{pt.address}}
-            </div>
-          </a> -->
-          <button ion-button icon-only (click)="getPonto(pt._id)">
-            <ion-icon [name]="pt.type.icon" slot="start"></ion-icon>
-            {{pt.description}}
-            <div class="item-note" slot="end">
-              {{pt.address}}
-            </div>
-          </button>
-        </ion-item>
-      </ion-list>
+
+<ion-content>
+    <ion-grid>
+      <ion-row class="title">
+          <ion-col class="left">
+            <fa-icon [icon]="faInfoCircle" size="2x"></fa-icon>
+          </ion-col>
+          <ion-col size="auto" style="padding-top: 19px;">
+            Cidade Coletiva
+          </ion-col>
+          <ion-col class="right">
+            <fa-icon [icon]="faCompass" size="2x"></fa-icon>
+          </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-list>
+              <ion-item *ngFor="let pt of pontos">
+                <button class="button button-full button-light" ion-button (click)="getPonto(pt._id)">
+                  <div class="points">
+                    <ul>        
+                      <li class="points-title">{{pt.description}}</li>
+                      <li>{{pt.address}}</li>
+                      <li>{{pt.phone}}</li>
+                    </ul>
+                  </div>
+                </button>
+              </ion-item>
+            </ion-list>
+          </ion-col>
+      </ion-row>
+
+    </ion-grid>
+    
       <!--
         <div *ngIf="selectedItem" padding>
           You navigated here from <b>{{selectedItem.title }}</b>
