@@ -1,0 +1,43 @@
+<ion-header>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row class="title">
+        <ion-col class="left">
+          <fa-icon [icon]="faChevronCircleLeft" size="2x"></fa-icon>
+        </ion-col>
+        <ion-col size="auto" style="padding-top: 19px;">
+          Cidade Coletiva
+        </ion-col>
+        <ion-col class="right">
+          <fa-icon [icon]="faCompass" size="2x"></fa-icon>
+        </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col class="description">
+        {{ponto.description}}
+      </ion-col>
+    </ion-row>
+    <ion-row class="data-all">
+      <ion-col class="data-left" size="40%"><fa-icon [icon]="faPhone" color="green"></fa-icon></ion-col>
+      <ion-col class="data">{{ponto.phone}}</ion-col>
+      <ion-col></ion-col>
+    </ion-row>
+    <ion-row class="data-all">
+      <ion-col class="data-left" size="40%"><fa-icon [icon]="faMapMarker" color="#019879"></fa-icon></ion-col>
+      <ion-col class="data">{{ponto.address}}</ion-col>
+      <ion-col></ion-col>
+    </ion-row>
+    <ion-row class="data-all">
+      <ion-col class="data-left" size="40%"><fa-icon [icon]="faDesktop" color="#019879"></fa-icon></ion-col>
+      <ion-col class="data">{{ponto.website}}</ion-col>
+      <ion-col></ion-col>
+    </ion-row>
+    <ion-row class="data-all">
+        <ion-col class="data-left" size="40%"><fa-icon [icon]="faRecycle" color="#019879"></fa-icon></ion-col>
+        <ion-col class="data">Materiais aceitos</ion-col>
+        <ion-col></ion-col>
+      </ion-row>    
+  </ion-grid>
+</ion-content>
