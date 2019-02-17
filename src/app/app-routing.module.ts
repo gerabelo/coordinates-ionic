@@ -13,10 +13,6 @@ const routes: Routes = [
     path: 'home',
     loadChildren: './home/home.module#HomePageModule'
   },
-  {
-    path: 'list',
-    loadChildren: './list/list.module#ListPageModule'
-  },
   { 
     path: 'ponto/:id',
     loadChildren: './ponto/ponto.module#PontoPageModule'
@@ -24,7 +20,8 @@ const routes: Routes = [
   { 
     path: 'pontos',
     loadChildren: './pontos/pontos.module#PontosPageModule'
-  }
+  },
+  { path: 'mapa', loadChildren: './mapa/mapa.module#MapaPageModule' }
 ];
 
 @NgModule({

@@ -13,17 +13,17 @@ export class Ponto {
     this.website = website;
   }
 
-  public id: String;
-  public description: String;
-  public phone: String;
-  public address: String;
-  public website: String;
-	public lat: String;
-	public lng: String;
-	public status: String;
+  public id: string;
+  public description: string;
+  public phone: string;
+  public address: string;
+  public website: string;
+	public lat: string;
+	public lng: string;
+	public status: string;
   public type: {
-      id: String;
-      icon: String;
+      id: string;
+      icon: string;
   }
 }
 
