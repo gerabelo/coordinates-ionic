@@ -43,7 +43,6 @@ export class MapaPage implements OnInit {
   ngOnInit() {
     this.wspontos.getPontos().subscribe(data => {
       this.pontos = data;
-      //console.log(data);
     });
 
     this.loadMap();
@@ -71,11 +70,11 @@ export class MapaPage implements OnInit {
             '</div>'+
             '<h1 id="firstHeading" class="firstHeading">'+ponto.description+'</h1>'+
             '<div id="bodyContent">'+
-            '<p>'+ponto.address+'</p>'+
-            '<p>'+ponto.phone+'</p>'+
-            '<p>'+this.distance(+ponto.lat,+ponto.lng)+' m</p>'+
+              '<p>'+ponto.address+'</p>'+
+              '<p>'+ponto.phone+'</p>'+
+              '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
             '</div>'+
-            '</div>'
+          '</div>'
         );
       });
       this.addMaker(this.myLatLng.lat, this.myLatLng.lng,null,null);
@@ -93,6 +92,8 @@ export class MapaPage implements OnInit {
 
   private addMaker(lat: number, lng: number, lbl: string, ico: string) {
     //https://developers.google.com/maps/documentation/javascript/markers
+    //https://developers.google.com/maps/documentation/javascript/distancematrix
+    //https://developers.google.com/maps/documentation/javascript/examples/marker-animations
     //var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
     const marker = new google.maps.Marker({
       position: { lat, lng },
@@ -111,27 +112,16 @@ export class MapaPage implements OnInit {
     };
   }
 
-  private distance(lat: number,lng: number) {
-    //haversine
-    var R = 6371000; // metres`
-
+  private geodesicDistance(lat: number,lng: number) {
+    var R = 6371000; // metres
     var φ1 = this.toRad(lat);
     var φ2 = this.toRad(+this.myLatLng.lat);
     var Δφ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lat)-this.toRad(lat),2));
     var Δλ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lng)-this.toRad(lng),2));
-    
-    var a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-            Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ/2) * Math.sin(Δλ/2);
-
+    var a = Math.sin(Δφ/2)*Math.sin(Δφ/2)+Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)*Math.sin(Δλ/2);
     var c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    
     var d = (R * c).toFixed(1);
-    // console.log("φ1: "+φ1);
-    // console.log("φ2: "+φ2);
-    // console.log("Δφ: "+Δφ);
-    // console.log("Δλ: "+Δλ);
-    //console.log(d);
+    
     return d;
   }
 
