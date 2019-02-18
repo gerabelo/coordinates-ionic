@@ -1,17 +1,17 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { Ponto } from './ponto';
-import { PontoPage } from './ponto/ponto.page';
+// import { Ponto } from './ponto';
+// import { PontoPage } from './ponto/ponto.page';
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'mapa',
     pathMatch: 'full'
   },
   {
     path: 'home',
-    loadChildren: './home/home.module#HomePageModule'
+    loadChildren: './mapa/mapa.module#MapaPageModule'
   },
   { 
     path: 'ponto/:id',
