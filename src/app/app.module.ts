@@ -16,6 +16,10 @@ import { HttpModule } from '@angular/http';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCompass, faInfoCircle, faChevronCircleLeft } from '@fortawesome/free-solid-svg-icons'
+<<<<<<< HEAD
+=======
+import { Geolocation } from '@ionic-native/geolocation/ngx';
+>>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
 
 library.add(faCompass, faInfoCircle);
 
@@ -33,6 +37,10 @@ library.add(faCompass, faInfoCircle);
   providers: [
     StatusBar,
     SplashScreen,
+<<<<<<< HEAD
+=======
+    Geolocation,
+>>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

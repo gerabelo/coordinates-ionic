@@ -1,5 +1,11 @@
 {
   "name": "coordinates",
+<<<<<<< HEAD
   "integrations": {},
+=======
+  "integrations": {
+    "cordova": {}
+  },
+>>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
   "type": "angular"
 }
