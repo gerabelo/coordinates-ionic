@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
-import { MenuController, NavController } from '@ionic/angular';
+import { MenuController, NavController, PopoverController } from '@ionic/angular';
 import { faCompass, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { PopoverComponent } from '../popover/popover.component';
 
 @Component({
   selector: 'app-pontos',
@@ -28,7 +29,8 @@ export class PontosPage implements OnInit {
   constructor(
     public wspontos: WsPontosService,
     public navCtrl: NavController,
-    private geolocation: Geolocation
+    private geolocation: Geolocation,
+    public popoverCtrl: PopoverController
   ) { this.loadPosition(); }
 
   ngOnInit(): void {
@@ -82,5 +84,14 @@ export class PontosPage implements OnInit {
 
   async loadPosition() {
     this.myLatLng = await this.getLocation();
+  }
+
+  async presentPopover(ev: any) {
+    const popover = await this.popoverCtrl.create({
+      component: PopoverComponent,
+      event: ev,
+      translucent: true
+    });
+    return await popover.present();
   }
 }

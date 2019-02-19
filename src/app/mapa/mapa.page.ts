@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, PopoverController } from '@ionic/angular';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop, faBars } from '@fortawesome/free-solid-svg-icons';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
 import { NavController } from '@ionic/angular';
+import { PopoverComponent } from '../popover/popover.component';
 
 declare var google;
 
@@ -38,7 +39,8 @@ export class MapaPage implements OnInit {
     private geolocation: Geolocation,
     private loadingCtrl: LoadingController,
     public wspontos: WsPontosService,
-    private navCtrl:NavController
+    private navCtrl:NavController,
+    public popoverCtrl: PopoverController
   ) {
 
   }
@@ -138,5 +140,15 @@ export class MapaPage implements OnInit {
 
   private goToAbout() {
     this.navCtrl.navigateForward('/about');
+  }
+
+  async presentPopover(ev: any) {
+    const popover = await this.popoverCtrl.create({
+      component: PopoverComponent,
+      event: ev,
+      translucent: true,
+      cssClass: 'custom-popover'
+    });
+    return await popover.present();
   }
 }

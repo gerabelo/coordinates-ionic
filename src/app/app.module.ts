@@ -17,12 +17,15 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCompass, faInfoCircle, faChevronCircleLeft } from '@fortawesome/free-solid-svg-icons'
 import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { PopoverComponent } from './popover/popover.component';
 
 library.add(faCompass, faInfoCircle);
 
 @NgModule({
-  declarations: [AppComponent],
-  entryComponents: [],
+  declarations: [AppComponent, PopoverComponent],
+  entryComponents: [
+    PopoverComponent
+  ],
   imports: [
     HttpClientModule,
     HttpModule,
