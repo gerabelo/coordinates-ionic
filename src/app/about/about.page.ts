@@ -8,7 +8,7 @@ import {Location} from '@angular/common';
 })
 export class AboutPage implements OnInit {
 
-  constructor(_location: Location) { }
+  constructor(  private _location: Location) { }
 
   ngOnInit() {
   }
