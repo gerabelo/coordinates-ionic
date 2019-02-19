@@ -90,7 +90,8 @@ export class PontosPage implements OnInit {
     const popover = await this.popoverCtrl.create({
       component: PopoverComponent,
       event: ev,
-      translucent: true
+      translucent: true,
+      cssClass: 'custom-popover'
     });
     return await popover.present();
   }

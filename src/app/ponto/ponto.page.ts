@@ -73,4 +73,8 @@ export class PontoPage implements OnInit {
     this.navCtrl.navigateForward('/mapa');
   }
 
+  private verificar() {}
+  private goToWebsite() {}
+  private verNoMapa() {}
+  private ligar() {}
 }
