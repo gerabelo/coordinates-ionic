@@ -67,8 +67,7 @@ ul > li {
     padding-left: 30px;
     text-align: left;
     font-weight: bold;
-    font-size: 16pt;
-    
+    font-size: 16pt;    
 }
 
 .data-left  {
@@ -125,4 +124,17 @@ ul > li {
     // display: flex;
     // align-content: center;
     // align-items: center;
+}
+
+.distance {
+    background-color: #DDD;
+    height: 50px;
+    margin: 0px !important;
+    padding-top: 15px;
+    padding-left: 30px;
+    padding-right: 30px;
+    text-align: right;
+    font-weight: bold;
+    font-size: 16pt;
+    color: #019879;
 }

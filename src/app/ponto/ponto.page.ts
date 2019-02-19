@@ -23,7 +23,9 @@ export class PontoPage implements OnInit {
   faRecycle = faRecycle;
   faDesktop = faDesktop;
 
-  myLatLng = null;
+  // myLatLng = null;
+
+  distance = null;
 
   constructor(
     public wspontos: WsPontosService,
@@ -36,8 +38,28 @@ export class PontoPage implements OnInit {
   ngOnInit() {
     this.wspontos.getPonto(this.activatedRoute.snapshot.paramMap.get('id')).subscribe(data => {
       this.ponto = data;
+
+      var p1 = new Promise((resolve,reject)=>{
+        var myLatLng = this.getLocation();
+        resolve(myLatLng);
+        // reject(window.location.reload());
+      });  
+      p1.then(async (value)=>{
+          // console.log("value: "+JSON.stringify(value));
+          // console.log("ponto: "+JSON.stringify(data));
+          // console.log("lat lng: "+data.lat+" "+data.lng);
+          // this.distance = await this.geodesicDistance(+data.lat,+data.lng);
+          // console.log("distance: "+this.distance);
+          var p2 = new Promise(async(sucess,fail)=>{
+            var distancia = this.geodesicDistance(+data.lat,+data.lng,+value.lat,+value.lng);
+            sucess(distancia);
+          });
+          p2.then((result)=>{
+            console.log("value:"+result);
+            this.distance = result;
+          });
+      });
     });
-    this.myLatLng = this.getLocation();
   }
   goback() {
     // this.navCtrl.navigateBack;
@@ -52,16 +74,21 @@ export class PontoPage implements OnInit {
     };
   }
 
-  private geodesicDistance(lat: number,lng: number) {
+  private geodesicDistance(lat1: number,lng1: number,lat2: number,lng2: number) {
+    // console.log("lat lng: "+lat1+" "+lng1);
     var R = 6371000; // metres
-    var φ1 = this.toRad(lat);
-    var φ2 = this.toRad(+this.myLatLng.lat);
-    var Δφ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lat)-this.toRad(lat),2));
-    var Δλ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lng)-this.toRad(lng),2));
+    var φ1 = this.toRad(lat1);
+    var φ2 = this.toRad(+lat2);
+    var Δφ = Math.sqrt(Math.pow(this.toRad(+lat2)-this.toRad(lat1),2));
+    var Δλ = Math.sqrt(Math.pow(this.toRad(+lng2)-this.toRad(lng1),2));
     var a = Math.sin(Δφ/2)*Math.sin(Δφ/2)+Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)*Math.sin(Δλ/2);
     var c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     var d = (R * c).toFixed(1);
-    
+    // console.log("φ1: "+φ1);
+    // console.log("φ2: "+φ2);
+    // console.log("Δφ: "+Δφ);
+    // console.log("Δλ: "+Δλ);
+    // console.log("c: "+c);
     return d;
   }
 

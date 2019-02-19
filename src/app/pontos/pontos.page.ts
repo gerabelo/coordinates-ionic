@@ -24,7 +24,7 @@ export class PontosPage implements OnInit {
   //   lng: number
   // }
   
-  myLatLng = null;
+  // myLatLng = null;
   
   constructor(
     public wspontos: WsPontosService,
@@ -33,14 +33,24 @@ export class PontosPage implements OnInit {
     public popoverCtrl: PopoverController
   ) { this.loadPosition(); }
 
-  ngOnInit(): void {
-    
+  ngOnInit(): void {    
     this.wspontos.getPontos().subscribe(data => {
       this.pontos = data;
       console.log(data);
-      this.myLatLng = this.getLocation().then(() => {
+      var p1 = new Promise((resolve,reject)=>{
+        var myLatLng = this.getLocation();
+        resolve(myLatLng);
+      });  
+      p1.then((value)=>{
+        // console.log("value:"+JSON.stringify(value));
         this.pontos.forEach(ponto => {
-          this.distances.push(this.geodesicDistance(+ponto.lat,+ponto.lng));
+          var p2 = new Promise((sucess,fail)=>{
+            sucess(this.geodesicDistance(+ponto.lat,+ponto.lng,+value.lat,+value.lng));
+          });
+          p2.then((result)=>{
+            console.log("value:"+result);
+            this.distances.push(result);
+          });
         });
       });
     });    
@@ -50,17 +60,24 @@ export class PontosPage implements OnInit {
     this.navCtrl.navigateForward('/ponto/'+id);
   }
 
-  private geodesicDistance(lat: number,lng: number) {
+  private geodesicDistance(lat1: number,lng1: number,lat2: number,lng2: number) {
+    // console.log("lat lng: "+lat1+" "+lng1);
     var R = 6371000; // metres
-    var φ1 = this.toRad(lat);
-    var φ2 = this.toRad(+this.myLatLng.lat);
-    var Δφ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lat)-this.toRad(lat),2));
-    var Δλ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lng)-this.toRad(lng),2));
+    var φ1 = this.toRad(lat1);
+    var φ2 = this.toRad(+lat2);
+    var Δφ = Math.sqrt(Math.pow(this.toRad(+lat2)-this.toRad(lat1),2));
+    var Δλ = Math.sqrt(Math.pow(this.toRad(+lng2)-this.toRad(lng1),2));
     var a = Math.sin(Δφ/2)*Math.sin(Δφ/2)+Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)*Math.sin(Δλ/2);
     var c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     var d = (R * c).toFixed(1);
+    // console.log("φ1: "+φ1);
+    // console.log("φ2: "+φ2);
+    // console.log("Δφ: "+Δφ);
+    // console.log("Δλ: "+Δλ);
+    // console.log("c: "+c);
     return d;
   }
+
 
   public toRad(value: number) {
     return value * Math.PI / 180;

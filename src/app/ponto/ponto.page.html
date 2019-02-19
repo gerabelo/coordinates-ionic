@@ -23,6 +23,9 @@
       <ion-col class="description">
         {{ponto.description}}
       </ion-col>
+      <ion-col class="distance">
+        {{distance}}m
+      </ion-col>
     </ion-row>
     <ion-row class="data-all" *ngIf="ponto.phone">
       <ion-col class="data-left" size="40%"><fa-icon [icon]="faPhone" color="green"></fa-icon></ion-col>
