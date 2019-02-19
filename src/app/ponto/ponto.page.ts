@@ -5,6 +5,7 @@ import { NavController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-ponto',
@@ -28,7 +29,8 @@ export class PontoPage implements OnInit {
     public wspontos: WsPontosService,
     public navCtrl: NavController,
     private activatedRoute: ActivatedRoute,
-    private geolocation: Geolocation
+    private geolocation: Geolocation,
+    private _location: Location
   ) { }
 
   ngOnInit() {
@@ -38,7 +40,8 @@ export class PontoPage implements OnInit {
     this.myLatLng = this.getLocation();
   }
   goback() {
-    this.navCtrl.navigateBack;
+    // this.navCtrl.navigateBack;
+    this._location.back();
   }
   
   private async getLocation() {
@@ -65,4 +68,9 @@ export class PontoPage implements OnInit {
   public toRad(value: number) {
     return value * Math.PI / 180;
   }
+
+  private goToMapa() {
+    this.navCtrl.navigateForward('/mapa');
+  }
+
 }

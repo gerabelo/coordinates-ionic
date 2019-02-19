@@ -19,7 +19,7 @@ export class WsPontosService implements OnInit {
     return this.http.get<Ponto[]>('http://localhost:3000/coordinate/', { headers: httpHeaders});
   }
 
-  public getPonto(id: string): Observable<Ponto> {
+  public getPonto(id: string) {
     //let httpParams = new HttpParams();
     //let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
     //httpParams.append("id",id); 

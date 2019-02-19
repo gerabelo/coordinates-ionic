@@ -13,25 +13,35 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 export class PontosPage implements OnInit {
   public pontos: Ponto[] = [];
+  // public distances: string[] = [];
+  public distances: Array<string> = [];
   faCompass = faCompass;
   faInfoCircle = faInfoCircle;
 
-  myLatLng: {
-    lat: number,
-    lng: number
-  }
+  // myLatLng: {
+  //   lat: number,
+  //   lng: number
+  // }
+  
+  myLatLng = null;
   
   constructor(
     public wspontos: WsPontosService,
     public navCtrl: NavController,
     private geolocation: Geolocation
-  ) {  }
+  ) { this.loadPosition(); }
 
   ngOnInit(): void {
+    
     this.wspontos.getPontos().subscribe(data => {
       this.pontos = data;
       console.log(data);
-    });
+      this.myLatLng = this.getLocation().then(() => {
+        this.pontos.forEach(ponto => {
+          this.distances.push(this.geodesicDistance(+ponto.lat,+ponto.lng));
+        });
+      });
+    });    
   }
 
   getPonto(id: string) {
@@ -47,11 +57,30 @@ export class PontosPage implements OnInit {
     var a = Math.sin(Δφ/2)*Math.sin(Δφ/2)+Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)*Math.sin(Δλ/2);
     var c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     var d = (R * c).toFixed(1);
-    
     return d;
   }
 
   public toRad(value: number) {
     return value * Math.PI / 180;
+  }
+
+  private goToMapa() {
+    this.navCtrl.navigateForward('/mapa');
+  }
+
+  private goToAbout() {
+    this.navCtrl.navigateForward('/about');
+  }
+
+  private async getLocation() {
+    const rta = await this.geolocation.getCurrentPosition();
+    return {
+      lat: rta.coords.latitude,
+      lng: rta.coords.longitude
+    };
+  }
+
+  async loadPosition() {
+    this.myLatLng = await this.getLocation();
   }
 }

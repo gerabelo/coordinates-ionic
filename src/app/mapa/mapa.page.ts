@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { LoadingController } from '@ionic/angular';
-import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop } from '@fortawesome/free-solid-svg-icons';
+import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop, faBars } from '@fortawesome/free-solid-svg-icons';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
+import { NavController } from '@ionic/angular';
 
 declare var google;
 
@@ -23,6 +24,7 @@ export class MapaPage implements OnInit {
   faPhone = faPhone;
   faRecycle = faRecycle;
   faDesktop = faDesktop;
+  faBars = faBars;
 
   mapRef = null;
 
@@ -35,7 +37,8 @@ export class MapaPage implements OnInit {
   constructor(
     private geolocation: Geolocation,
     private loadingCtrl: LoadingController,
-    public wspontos: WsPontosService
+    public wspontos: WsPontosService,
+    private navCtrl:NavController
   ) {
 
   }
@@ -127,5 +130,13 @@ export class MapaPage implements OnInit {
 
   public toRad(value: number) {
     return value * Math.PI / 180;
+  }
+
+  private goToList() {
+    this.navCtrl.navigateForward('/pontos');
+  }
+
+  private goToAbout() {
+    this.navCtrl.navigateForward('/about');
   }
 }

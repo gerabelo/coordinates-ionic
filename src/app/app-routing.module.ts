@@ -21,7 +21,8 @@ const routes: Routes = [
     path: 'pontos',
     loadChildren: './pontos/pontos.module#PontosPageModule'
   },
-  { path: 'mapa', loadChildren: './mapa/mapa.module#MapaPageModule' }
+  { path: 'mapa', loadChildren: './mapa/mapa.module#MapaPageModule' },
+  { path: 'about', loadChildren: './about/about.module#AboutPageModule' }
 ];
 
 @NgModule({

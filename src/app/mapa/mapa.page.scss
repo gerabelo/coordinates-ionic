@@ -1,13 +1,17 @@
 @import url(https://fonts.googleapis.com/css?family=Montserrat);
 $font-family-base: "Montserrat", sans-serif !default;
+ion-content {
+    font-family: 'Montserrat', sans-serif;
+}
+
+ion-button {
+    text-decoration: none;
+    color: #FFF;
+}
 
 #map{
     width: 100%;
     height: 100%;
-}  
-
-ion-content {
-    font-family: 'Montserrat', sans-serif;
 }
 
 button {
@@ -100,3 +104,4 @@ ul > li {
 .no-padding {
     padding: 0px !important;
 }
+

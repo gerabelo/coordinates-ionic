@@ -1,14 +1,18 @@
 <ion-header>
-  <ion-grid>
+  <ion-grid no-padding>
     <ion-row class="title">
         <ion-col class="left">
-          <fa-icon [icon]="faInfoCircle" size="2x"></fa-icon>
+          <ion-button fill="clear" color="white" block (click)="goToAbout()">
+            <fa-icon [icon]="faInfoCircle" size="2x"></fa-icon>
+          </ion-button>
         </ion-col>
         <ion-col size="auto" style="padding-top: 19px;">
           Cidade Coletiva
         </ion-col>
         <ion-col class="right">
-          <fa-icon [icon]="faCompass" size="2x"></fa-icon>
+          <ion-button fill="clear" color="white" block (click)="goToMapa()">
+            <fa-icon [icon]="faCompass" size="2x"></fa-icon>
+          </ion-button>
         </ion-col>
     </ion-row>
   </ion-grid>
@@ -19,15 +23,22 @@
       <ion-row>
         <ion-col>
           <ion-list>
-              <ion-item *ngFor="let pt of pontos">
+              <ion-item *ngFor="let pt of pontos; index as i">
                 <button class="button button-full button-light" ion-button (click)="getPonto(pt._id)">
-                  <div class="points">
-                    <ul>        
-                      <li class="points-title">{{pt.description}}</li>
-                      <li>{{pt.address}}</li>
-                      <li>{{pt.phone}}</li>
-                    </ul>
-                  </div>
+                  <ion-col>
+                    <div class="points">
+                      <ul>        
+                        <li class="points-title">{{pt.description}}</li>
+                        <li>{{pt.address}}</li>
+                        <li>{{pt.phone}}</li>
+                      </ul>
+                    </div>
+                  </ion-col>
+                  <ion-col>
+                    <div class="distance">
+                      {{distances[i]}}m
+                    </div>
+                </ion-col>
                 </button>
               </ion-item>
             </ion-list>
