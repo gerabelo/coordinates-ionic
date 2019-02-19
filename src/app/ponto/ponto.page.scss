@@ -72,20 +72,26 @@ ul > li {
 }
 
 .data-left  {
-    padding-top: 20px;
+    // padding-top: 20px;
     padding-left:40px;
-    text-align: left;
-    height: 40px;
+    // text-align: left;
+    height: 60px;
+    display: flex;
+    align-content: center;
+    align-items: center;    
 }
 
 .data {
-    padding-top: 20px;
-    padding-bottom: 10px;
+    // padding-top: 20px;
+    // padding-bottom: 10px;
     // padding-left:40px;
     text-align: left;
     height: 60px;
     // line-height: 30px;
     vertical-align: middle;
+    display: flex;
+    align-content: center;
+    align-items: center;
 }
 
 .data-all {
@@ -115,5 +121,8 @@ ul > li {
     text-align: center;
     font-family: 'Montserrat', sans-serif;
     font-size: 12pt;
-    font-weight: bold;
+    font-weight: normal;
+    // display: flex;
+    // align-content: center;
+    // align-items: center;
 }
