@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-about',
@@ -7,9 +8,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AboutPage implements OnInit {
 
-  constructor() { }
+  constructor(_location: Location) { }
 
   ngOnInit() {
+  }
+
+  goback() {
+    // this.navCtrl.navigateBack;
+    this._location.back();
   }
 
 }
