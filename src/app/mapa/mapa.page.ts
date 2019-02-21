@@ -10,6 +10,7 @@ import { AlertController } from '@ionic/angular';
 import { Placeholder } from '@angular/compiler/src/i18n/i18n_ast';
 import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
 import { stringify } from '@angular/core/src/util';
+import { logging } from 'protractor';
 
 declare var google;
 
@@ -31,10 +32,9 @@ export class MapaPage implements OnInit {
   faDesktop = faDesktop;
   faBars = faBars;
 
+  logado = false;
   mapRef = null;
-
   myLatLng = null;
-
   myMark = null;
   // myLatLng: {
   //   lat: number,
@@ -59,6 +59,7 @@ export class MapaPage implements OnInit {
   }
 
   ngOnInit() {
+    this.login();
     this.wspontos.getPontos().subscribe(data => {
       this.pontos = data;
     });
@@ -66,35 +67,93 @@ export class MapaPage implements OnInit {
     this.loadMap();
   }
 
+  private async login() {
+    const alert3 = await this.alertCtrl.create({
+      backdropDismiss: false,
+      // header: `Login`,
+      // message: `<p class='alert'><b>Não há pontos para exibir!</p>`,          
+      inputs: [
+        {
+          name: 'login',
+          // label: 'user',
+          placeholder: 'user',
+          type: 'text'
+        },
+        {
+          name: 'password',
+          // label: 'password',
+          placeholder: 'password',
+          type: 'password'
+        }
+      ], 
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'alert-cancel',
+          handler: () => {
+            this.logado = false;
+            this.login();
+          }
+        },
+        {
+          text: 'Login',
+          cssClass: 'alert-ok',
+          handler: (data) => {
+            if (data.login === 'root' && data.password === '123456') {
+              this.logado = true;
+              
+            } else {
+              this.logado = false;
+              this.login();
+            }
+            
+          }
+        }
+      ]
+    });
+    return await alert3.present();
+  }
+
   async loadMap() {
     const loading = await this.loadingCtrl.create();
     loading.present();
-    this.myLatLng = await this.getLocation();
-    const mapEle: HTMLElement = document.getElementById('map');
-    this.mapRef = new google.maps.Map(mapEle, {
-      center: this.myLatLng,
-      zoom: 15
-    });
+    try {
+      this.myLatLng = await this.getLocation();
+    } finally {
+      const mapEle: HTMLElement = document.getElementById('map');
+      this.mapRef = new google.maps.Map(mapEle, {
+        center: this.myLatLng,
+        zoom: 15
+      });
+      
+    }
+    
     google.maps.event
     .addListenerOnce(this.mapRef, 'idle', () => {
       loading.dismiss();
-      this.pontos.forEach(ponto => {
-        this.addInfoWindow(
-          this.mapRef,
-          //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
-          this.addMaker(+ponto.lat,+ponto.lng,null,ponto.type.icon,false),
-          '<div id="content">'+
-            '<div id="siteNotice">'+
-            '</div>'+
-            '<h1 id="firstHeading" class="firstHeading">'+ponto.description+'</h1>'+
-            '<div id="bodyContent">'+
-              '<p>'+ponto.address+'</br>'+
-              ponto.phone+'</br>'+
-              this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
-            '</div>'+
-          '</div>'
-        );
-      });
+      if (this.pontos.length) {
+        this.pontos.forEach(ponto => {
+          this.addInfoWindow(
+            this.mapRef,
+            //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
+            this.addMaker(+ponto.lat,+ponto.lng,null,ponto.type.icon,false),
+            // '<div id="infoWindow-'+ponto.type.id+'">'+
+            '<div id="content">'+
+              '<div id="siteNotice">'+
+              '</div>'+
+              '<h1 id="firstHeading" class="firstHeading">'+ponto.description+'</h1>'+
+              '<div id="bodyContent">'+
+                '<p>'+ponto.address+'</br>'+
+                ponto.phone+'</br>'+
+                this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
+              '</div>'+
+            '</div>'
+          );
+        });
+      }
+      
+      
       this.myMark = this.addMaker(this.myLatLng.lat, this.myLatLng.lng,null,"assets/icon/mylocation.png",true);
       this.pickUp(this.myMark);
     });

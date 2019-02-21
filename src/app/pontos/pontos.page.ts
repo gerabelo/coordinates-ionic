@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
-import { MenuController, NavController, PopoverController } from '@ionic/angular';
+import { MenuController, NavController, PopoverController, AlertController } from '@ionic/angular';
 import { faCompass, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { PopoverComponent } from '../popover/popover.component';
@@ -30,29 +30,34 @@ export class PontosPage implements OnInit {
     public wspontos: WsPontosService,
     public navCtrl: NavController,
     private geolocation: Geolocation,
-    public popoverCtrl: PopoverController
+    public popoverCtrl: PopoverController,
+    private alertCtrl: AlertController
   ) { }
 
   ngOnInit(): void {    
     this.wspontos.getPontos().subscribe(data => {
       this.pontos = data;
-      console.log(data);
-      var p1 = new Promise((resolve,reject)=>{
-        var myLatLng = this.getLocation();
-        resolve(myLatLng);
-      });  
-      p1.then((value: {lat:number,lng:number})=>{
-        // console.log("value:"+JSON.stringify(value));
-        this.pontos.forEach(ponto => {
-          var p2 = new Promise((sucess,fail)=>{
-            sucess(this.geodesicDistance(+ponto.lat,+ponto.lng,+value.lat,+value.lng));
-          });
-          p2.then((result:string)=>{
-            console.log("value:"+result);
-            this.distances.push(result);
+      //console.log(data);
+      if (this.pontos.length) {
+        var p1 = new Promise((resolve,reject)=>{
+          var myLatLng = this.getLocation();
+          resolve(myLatLng);
+        });  
+        p1.then((value: {lat:number,lng:number})=>{
+          // console.log("value:"+JSON.stringify(value));
+          this.pontos.forEach(ponto => {
+            var p2 = new Promise((sucess,fail)=>{
+              sucess(this.geodesicDistance(+ponto.lat,+ponto.lng,+value.lat,+value.lng));
+            });
+            p2.then((result:string)=>{
+              console.log("value:"+result);
+              this.distances.push(result);
+            });
           });
         });
-      });
+      } else {
+        this.alertNoEntries();
+      }      
     });    
   }
 
@@ -111,5 +116,23 @@ export class PontosPage implements OnInit {
       cssClass: 'custom-popover'
     });
     return await popover.present();
+  }
+
+  async alertNoEntries() {
+    const alert2 = await this.alertCtrl.create({
+      header: `Atenção`,
+      message: `<p class='alert'><b>Não há pontos para exibir!</p>`,          
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'cancel',
+          cssClass: 'alert-cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        }
+      ]
+    });
+    return await alert2.present();        
   }
 }
