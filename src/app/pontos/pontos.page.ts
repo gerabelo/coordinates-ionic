@@ -31,7 +31,7 @@ export class PontosPage implements OnInit {
     public navCtrl: NavController,
     private geolocation: Geolocation,
     public popoverCtrl: PopoverController
-  ) { this.loadPosition(); }
+  ) { }
 
   ngOnInit(): void {    
     this.wspontos.getPontos().subscribe(data => {
@@ -41,13 +41,13 @@ export class PontosPage implements OnInit {
         var myLatLng = this.getLocation();
         resolve(myLatLng);
       });  
-      p1.then((value)=>{
+      p1.then((value: {lat:number,lng:number})=>{
         // console.log("value:"+JSON.stringify(value));
         this.pontos.forEach(ponto => {
           var p2 = new Promise((sucess,fail)=>{
             sucess(this.geodesicDistance(+ponto.lat,+ponto.lng,+value.lat,+value.lng));
           });
-          p2.then((result)=>{
+          p2.then((result:string)=>{
             console.log("value:"+result);
             this.distances.push(result);
           });
@@ -99,9 +99,9 @@ export class PontosPage implements OnInit {
     };
   }
 
-  async loadPosition() {
-    this.myLatLng = await this.getLocation();
-  }
+  // async loadPosition() {
+  //   this.myLatLng = await this.getLocation();
+  // }
 
   async presentPopover(ev: any) {
     const popover = await this.popoverCtrl.create({

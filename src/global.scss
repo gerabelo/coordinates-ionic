@@ -34,3 +34,32 @@ i[class^="fa-"], ion-icon[class^="fa-"] {
    color: #019879;
    background-color: #FFF;
 }
+
+.alert-cancel {
+   color: blue;
+   text-align: right;
+   font-family: 'Montserrat', sans-serif;
+   font-size: 12pt;
+   font-weight: normal;
+   // // width: 100%;
+   // border-top: 3px solid grey;
+   // border-right:  3px solid grey;
+}
+
+.alert-ok {
+   color: blue;
+   text-align: left;
+   font-family: 'Montserrat', sans-serif;
+   font-size: 12pt;
+   font-weight: bold;
+   // width: 50%;
+   // border-top: 3px solid grey;
+}
+
+.alert {
+   color: grey;
+   text-align: center;
+   font-family: 'Montserrat', sans-serif;
+   font-size: 9pt;
+   font-weight: bold;
+}

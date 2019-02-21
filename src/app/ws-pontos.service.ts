@@ -1,3 +1,4 @@
+//https://ionicframework.com/docs/native/http/
 import { Injectable, OnInit } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders, HttpClientModule } from '@angular/common/http';
 //import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
@@ -29,4 +30,13 @@ export class WsPontosService implements OnInit {
     //this.pontos.find(ponto => ponto.id === id)
   }
 
+  public sendCoordinate(ponto: Ponto) {
+    var data: string;
+    //let httpHeaders = new HttpHeaders({'Content-Type': 'application/json' });
+    console.log('ponto: '+JSON.stringify(ponto));
+    data = JSON.stringify(ponto);
+    return this.http.post<Ponto>('http://localhost:3000/coordinate/add', ponto, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
 }

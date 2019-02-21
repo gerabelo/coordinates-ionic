@@ -6,6 +6,9 @@ import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
 import { NavController } from '@ionic/angular';
 import { PopoverComponent } from '../popover/popover.component';
+import { AlertController } from '@ionic/angular';
+import { Placeholder } from '@angular/compiler/src/i18n/i18n_ast';
+import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
 
 declare var google;
 
@@ -30,17 +33,26 @@ export class MapaPage implements OnInit {
   mapRef = null;
 
   myLatLng = null;
+
+  myMark = null;
   // myLatLng: {
   //   lat: number,
   //   lng: number
   // }
+
+  options: NativeGeocoderOptions = {
+    useLocale: true,
+    maxResults: 5
+  };
 
   constructor(
     private geolocation: Geolocation,
     private loadingCtrl: LoadingController,
     public wspontos: WsPontosService,
     private navCtrl:NavController,
-    public popoverCtrl: PopoverController
+    public popoverCtrl: PopoverController,
+    private alertCtrl: AlertController,
+    private nativeGeocoder: NativeGeocoder
   ) {
 
   }
@@ -69,7 +81,7 @@ export class MapaPage implements OnInit {
         this.addInfoWindow(
           this.mapRef,
           //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
-          this.addMaker(+ponto.lat,+ponto.lng,null,ponto.type.icon),
+          this.addMaker(+ponto.lat,+ponto.lng,null,ponto.type.icon,false),
           '<div id="content">'+
             '<div id="siteNotice">'+
             '</div>'+
@@ -82,7 +94,8 @@ export class MapaPage implements OnInit {
           '</div>'
         );
       });
-      this.addMaker(this.myLatLng.lat, this.myLatLng.lng,null,null);
+      this.myMark = this.addMaker(this.myLatLng.lat, this.myLatLng.lng,null,"assets/icon/mylocation.png",true);
+      this.pickUp(this.myMark);
     });
   }
 
@@ -95,7 +108,7 @@ export class MapaPage implements OnInit {
     })
   }
 
-  private addMaker(lat: number, lng: number, lbl: string, ico: string) {
+  private addMaker(lat: number, lng: number, lbl: string, ico: string, drag) {
     //https://developers.google.com/maps/documentation/javascript/markers
     //https://developers.google.com/maps/documentation/javascript/distancematrix
     //https://developers.google.com/maps/documentation/javascript/examples/marker-animations
@@ -104,7 +117,9 @@ export class MapaPage implements OnInit {
       position: { lat, lng },
       map: this.mapRef,
       label: lbl,
-      icon: ico
+      icon: ico,
+      animation: google.maps.Animation.DROP,
+      draggable: drag
     });
     return marker;
   }
@@ -143,6 +158,7 @@ export class MapaPage implements OnInit {
   }
 
   async presentPopover(ev: any) {
+    //popOver do ABOUT
     const popover = await this.popoverCtrl.create({
       component: PopoverComponent,
       event: ev,
@@ -151,4 +167,96 @@ export class MapaPage implements OnInit {
     });
     return await popover.present();
   }
+
+  private pickUp(marker) {
+    var lat: number;
+    var lng: number;
+
+    google.maps.event.addListener(marker,'dragend',() => {
+      lat = marker.position.lat();
+      lng = marker.position.lng();
+      this.sendPointConfirm(lat,lng);
+    })
+ 
+  }
+
+  async sendPointConfirm(lat,lng) {
+  //https://ionicframework.com/docs/v3/3.3.0/api/components/alert/AlertController/    
+  //https://ionicframework.com/docs/native/native-geocoder/
+    var endereco: string;
+    this.nativeGeocoder.reverseGeocode(lat, lng, this.options)
+    .then((result: NativeGeocoderReverseResult[]) => {
+      endereco = JSON.stringify(result[0]);
+      console.log(JSON.stringify(result[0]));
+    })
+    .catch((error: any) => console.log("error: "+error));
+
+    const alert = await this.alertCtrl.create({
+      //header: '[Novo Ponto]',
+      message: `<p class='alert'><b>[Novo Ponto]</br></br>lat:</b> `+lat+`</br><b>lng:</b> `+lng+`</p>`,
+      inputs: [
+        {
+          name: 'description',
+          placeholder: 'descrição'
+        },
+        {
+          name: 'phone',
+          placeholder: 'contato'
+        },
+        {
+          name: 'address',
+          placeholder: 'endereço'
+        },
+        {
+          name: 'website',
+          type: 'url',
+          placeholder: 'website'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'alert-cancel',
+          handler: () => {
+            console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Enviar',
+          cssClass: 'alert-ok',
+          handler: data => {
+            console.log('Send clicked');
+            var status = 0;
+            var type = { id:'xyz', icon:'assets/icon/recycleBlueMarker.png'};
+            var ponto = new Ponto(null,data.description,data.phone,data.address,lat,lng,status,type,data.website);
+            this.wspontos.sendCoordinate(ponto).subscribe( result => {
+              console.log('result: '+JSON.stringify(result));
+            });
+            //window.location.reload();
+            this.myMark.setMap(null);
+            this.addInfoWindow(
+              this.mapRef,
+              //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
+              this.addMaker(+ponto.lat,+ponto.lng,null,ponto.type.icon,false),
+              '<div id="content">'+
+                '<div id="siteNotice">'+
+                '</div>'+
+                '<h1 id="firstHeading" class="firstHeading">'+ponto.description+'</h1>'+
+                '<div id="bodyContent">'+
+                  '<p>'+ponto.address+'</p>'+
+                  '<p>'+ponto.phone+'</p>'+
+                  '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
+                '</div>'+
+              '</div>'
+            );
+            this.myMark = this.addMaker(this.myLatLng.lat, this.myLatLng.lng,null,"assets/icon/mylocation.png",true);
+            this.pickUp(this.myMark);
+          }
+        }
+      ]
+    });
+    return await alert.present();
+  }
+
 }

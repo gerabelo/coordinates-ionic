@@ -23,7 +23,10 @@ export class PontoPage implements OnInit {
   faRecycle = faRecycle;
   faDesktop = faDesktop;
 
-  // myLatLng = null;
+  myLatLng: {
+    lat: number,
+    lng: number
+  };
 
   distance = null;
 
@@ -39,12 +42,12 @@ export class PontoPage implements OnInit {
     this.wspontos.getPonto(this.activatedRoute.snapshot.paramMap.get('id')).subscribe(data => {
       this.ponto = data;
 
-      var p1 = new Promise((resolve,reject)=>{
-        var myLatLng = this.getLocation();
-        resolve(myLatLng);
+      var p1 = new Promise(async (resolve,reject)=>{
+        this.myLatLng = await this.getLocation();
+        resolve(this.myLatLng);
         // reject(window.location.reload());
       });  
-      p1.then(async (value)=>{
+      p1.then(async (value: {lat:number, lng:number})=>{
           // console.log("value: "+JSON.stringify(value));
           // console.log("ponto: "+JSON.stringify(data));
           // console.log("lat lng: "+data.lat+" "+data.lng);
