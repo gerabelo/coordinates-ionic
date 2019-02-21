@@ -9,6 +9,7 @@ import { PopoverComponent } from '../popover/popover.component';
 import { AlertController } from '@ionic/angular';
 import { Placeholder } from '@angular/compiler/src/i18n/i18n_ast';
 import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
+import { stringify } from '@angular/core/src/util';
 
 declare var google;
 
@@ -87,9 +88,9 @@ export class MapaPage implements OnInit {
             '</div>'+
             '<h1 id="firstHeading" class="firstHeading">'+ponto.description+'</h1>'+
             '<div id="bodyContent">'+
-              '<p>'+ponto.address+'</p>'+
-              '<p>'+ponto.phone+'</p>'+
-              '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
+              '<p>'+ponto.address+'</br>'+
+              ponto.phone+'</br>'+
+              this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
             '</div>'+
           '</div>'
         );
@@ -190,22 +191,25 @@ export class MapaPage implements OnInit {
       console.log(JSON.stringify(result[0]));
     })
     .catch((error: any) => console.log("error: "+error));
-
+    console.log('endereco: '+endereco)
     const alert = await this.alertCtrl.create({
       //header: '[Novo Ponto]',
       message: `<p class='alert'><b>[Novo Ponto]</br></br>lat:</b> `+lat+`</br><b>lng:</b> `+lng+`</p>`,
       inputs: [
         {
           name: 'description',
-          placeholder: 'descrição'
+          placeholder: 'descrição',
+          type: 'text'
         },
         {
           name: 'phone',
-          placeholder: 'contato'
+          placeholder: 'contato',
+          type: 'text'
         },
         {
           name: 'address',
-          placeholder: 'endereço'
+          placeholder: 'endereço',
+          type: 'text'
         },
         {
           name: 'website',
@@ -223,35 +227,78 @@ export class MapaPage implements OnInit {
           }
         },
         {
-          text: 'Enviar',
+          text: 'Proximo',
           cssClass: 'alert-ok',
-          handler: data => {
+          handler: async data => {
             console.log('Send clicked');
             var status = 0;
-            var type = { id:'xyz', icon:'assets/icon/recycleBlueMarker.png'};
-            var ponto = new Ponto(null,data.description,data.phone,data.address,lat,lng,status,type,data.website);
-            this.wspontos.sendCoordinate(ponto).subscribe( result => {
-              console.log('result: '+JSON.stringify(result));
+            //var type = { id:'xyz', icon:'assets/icon/recycleBlueMarker.png'};
+            const alert2 = await this.alertCtrl.create({
+              message: `<p class='alert'><b>Informe o Tipo</p>`,
+              inputs: [
+                {
+                  name: 'type',
+                  label: 'Blue',
+                  value: {id: '001', icon: 'assets/icon/recycleBlueMarker.png' },
+                  type: 'radio',
+                  checked: true
+                },
+                {
+                  name: 'type',
+                  label: 'Green',
+                  value: {id: '002', icon: 'assets/icon/recycleGreenMarker.png' },
+                  type: 'radio',
+                },
+                {
+                  name: 'type',
+                  label: 'Red',
+                  value: {id: '003', icon: 'assets/icon/recycleRedMarker.png' },
+                  type: 'radio',
+                }
+              ],
+              buttons: [
+                {
+                  text: 'Cancelar',
+                  role: 'cancel',
+                  cssClass: 'alert-cancel',
+                  handler: () => {
+                    console.log('Cancel clicked');
+                  }
+                },
+                {
+                  text: 'Enviar',
+                  cssClass: 'alert-ok',
+                  handler: res => {
+                    console.log(`res: `+JSON.stringify(res));  
+                    //checkbox requires res[0].icon
+                    var ponto = new Ponto(null,data.description,data.phone,data.address,lat,lng,status,res,data.website);
+                    this.wspontos.sendCoordinate(ponto).subscribe( result => {
+                      console.log('result: '+JSON.stringify(result));
+                    });
+                    //window.location.reload();
+                    this.myMark.setMap(null);
+                    this.addInfoWindow(
+                      this.mapRef,
+                      //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
+                      this.addMaker(+ponto.lat,+ponto.lng,null,res.icon,false),
+                      '<div id="content">'+
+                        '<div id="siteNotice">'+
+                        '</div>'+
+                        '<h1 id="firstHeading" class="firstHeading">'+ponto.description+'</h1>'+
+                        '<div id="bodyContent">'+
+                          '<p>'+ponto.address+'</p>'+
+                          '<p>'+ponto.phone+'</p>'+
+                          '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
+                        '</div>'+
+                      '</div>'
+                    );
+                    this.myMark = this.addMaker(this.myLatLng.lat, this.myLatLng.lng,null,"assets/icon/mylocation.png",true);
+                    this.pickUp(this.myMark);
+                  }
+                }
+              ]
             });
-            //window.location.reload();
-            this.myMark.setMap(null);
-            this.addInfoWindow(
-              this.mapRef,
-              //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
-              this.addMaker(+ponto.lat,+ponto.lng,null,ponto.type.icon,false),
-              '<div id="content">'+
-                '<div id="siteNotice">'+
-                '</div>'+
-                '<h1 id="firstHeading" class="firstHeading">'+ponto.description+'</h1>'+
-                '<div id="bodyContent">'+
-                  '<p>'+ponto.address+'</p>'+
-                  '<p>'+ponto.phone+'</p>'+
-                  '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
-                '</div>'+
-              '</div>'
-            );
-            this.myMark = this.addMaker(this.myLatLng.lat, this.myLatLng.lng,null,"assets/icon/mylocation.png",true);
-            this.pickUp(this.myMark);
+            return await alert2.present();
           }
         }
       ]
