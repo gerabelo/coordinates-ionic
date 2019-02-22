@@ -4,10 +4,7 @@ import { Ponto } from '../ponto';
 import { NavController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop } from '@fortawesome/free-solid-svg-icons';
-<<<<<<< HEAD
-=======
 import { Geolocation } from '@ionic-native/geolocation/ngx';
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
 
 @Component({
   selector: 'app-ponto',
@@ -25,36 +22,24 @@ export class PontoPage implements OnInit {
   faRecycle = faRecycle;
   faDesktop = faDesktop;
 
-<<<<<<< HEAD
-=======
   myLatLng = null;
 
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
   constructor(
     public wspontos: WsPontosService,
     public navCtrl: NavController,
     private activatedRoute: ActivatedRoute,
-<<<<<<< HEAD
-  ) { }
-=======
     private geolocation: Geolocation
   ) { }
 
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
   ngOnInit() {
     this.wspontos.getPonto(this.activatedRoute.snapshot.paramMap.get('id')).subscribe(data => {
       this.ponto = data;
     });
-<<<<<<< HEAD
-=======
     this.myLatLng = this.getLocation();
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
   }
   goback() {
     this.navCtrl.navigateBack;
   }
-<<<<<<< HEAD
-=======
   
   private async getLocation() {
     const rta = await this.geolocation.getCurrentPosition();
@@ -80,5 +65,4 @@ export class PontoPage implements OnInit {
   public toRad(value: number) {
     return value * Math.PI / 180;
   }
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
 }

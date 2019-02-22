@@ -3,10 +3,7 @@ import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
 import { MenuController, NavController } from '@ionic/angular';
 import { faCompass, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-<<<<<<< HEAD
-=======
 import { Geolocation } from '@ionic-native/geolocation/ngx';
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
 
 @Component({
   selector: 'app-pontos',
@@ -19,9 +16,6 @@ export class PontosPage implements OnInit {
   faCompass = faCompass;
   faInfoCircle = faInfoCircle;
 
-<<<<<<< HEAD
-  constructor(public wspontos: WsPontosService, public navCtrl: NavController) {  }
-=======
   myLatLng: {
     lat: number,
     lng: number
@@ -32,7 +26,6 @@ export class PontosPage implements OnInit {
     public navCtrl: NavController,
     private geolocation: Geolocation
   ) {  }
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
 
   ngOnInit(): void {
     this.wspontos.getPontos().subscribe(data => {
@@ -44,8 +37,6 @@ export class PontosPage implements OnInit {
   getPonto(id: string) {
     this.navCtrl.navigateForward('/ponto/'+id);
   }
-<<<<<<< HEAD
-=======
 
   private geodesicDistance(lat: number,lng: number) {
     var R = 6371000; // metres
@@ -63,5 +54,4 @@ export class PontosPage implements OnInit {
   public toRad(value: number) {
     return value * Math.PI / 180;
   }
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
 }

@@ -11,13 +11,8 @@ export class AppComponent implements OnInit {
   public appPages = [
     {
       title: 'Home',
-<<<<<<< HEAD
-      url: '/home',
-      icon: 'home'
-=======
       url: '/mapa',
       icon: 'mapa'
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
     },
     {
       title: 'Pontos',
@@ -44,8 +39,4 @@ export class AppComponent implements OnInit {
       this.splashScreen.hide();
     });
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
