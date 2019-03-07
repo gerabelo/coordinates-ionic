@@ -22,7 +22,7 @@ const routes: Routes = [
     loadChildren: './pontos/pontos.module#PontosPageModule'
   },
   { path: 'mapa', loadChildren: './mapa/mapa.module#MapaPageModule' },
-  { path: 'about', loadChildren: './about/about.module#AboutPageModule' }
+  { path: 'cadastro', loadChildren: './cadastro/cadastro.module#CadastroPageModule' }
 ];
 
 @NgModule({

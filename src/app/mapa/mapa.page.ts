@@ -11,6 +11,10 @@ import { Placeholder } from '@angular/compiler/src/i18n/i18n_ast';
 import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
 import { stringify } from '@angular/core/src/util';
 import { logging } from 'protractor';
+import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
+import { Storage } from '@ionic/storage';
+import { User } from '../user';
+import { Observable } from 'rxjs';
 
 declare var google;
 
@@ -22,6 +26,7 @@ declare var google;
 
 export class MapaPage implements OnInit {
   public pontos: Ponto[] = [];
+  public user: User;
 
   faCompass = faCompass;
   faInfoCircle = faInfoCircle;
@@ -46,6 +51,13 @@ export class MapaPage implements OnInit {
     maxResults: 5
   };
 
+  cameraOptions: CameraOptions = {
+    quality: 100,
+    destinationType: this.camera.DestinationType.FILE_URI,
+    encodingType: this.camera.EncodingType.JPEG,
+    mediaType: this.camera.MediaType.PICTURE
+  }
+
   constructor(
     private geolocation: Geolocation,
     private loadingCtrl: LoadingController,
@@ -53,17 +65,33 @@ export class MapaPage implements OnInit {
     private navCtrl:NavController,
     public popoverCtrl: PopoverController,
     private alertCtrl: AlertController,
-    private nativeGeocoder: NativeGeocoder
-  ) {
-
-  }
+    private nativeGeocoder: NativeGeocoder,
+    private camera: Camera,
+    private storage: Storage
+  ) { }
 
   ngOnInit() {
-    this.login();
+    //this.login();
+    this.getLocalData().then((value) => {
+      console.log('cicoId: ', value);
+      if (value == null) {
+        this.user = null;
+        this.logado = false;
+        this.login();        
+      } else {
+        this.wspontos.fast(value).subscribe(usuario => {
+          this.user = usuario;
+        })
+        this.logado = true;
+      }      
+    }).catch((err) => {
+      this.logado = false;
+      this.login();              
+    });
     this.wspontos.getPontos().subscribe(data => {
       this.pontos = data;
     });
-
+    this.addPicture();
     this.loadMap();
   }
 
@@ -88,26 +116,47 @@ export class MapaPage implements OnInit {
       ], 
       buttons: [
         {
-          text: 'Cancelar',
+          text: 'Cadastrar',
           role: 'cancel',
           cssClass: 'alert-cancel',
           handler: () => {
-            this.logado = false;
-            this.login();
+            this.logado = true;
+            this.navCtrl.navigateForward('/cadastro');
           }
         },
+        // {
+        //   text: 'Cancelar',
+        //   role: 'cancel',
+        //   cssClass: 'alert-cancel',
+        //   handler: () => {
+        //     this.logado = false;
+        //     this.login();
+        //   }
+        // },
         {
           text: 'Login',
-          cssClass: 'alert-ok',
           handler: (data) => {
-            if (data.login === 'root' && data.password === '123456') {
-              this.logado = true;
+            // if (data.login === 'root' && data.password === '123456') {
+            //   this.logado = true;
               
-            } else {
-              this.logado = false;
-              this.login();
-            }
-            
+            // } else {
+            //   this.logado = false;
+            //   this.login();
+            // }
+            this.wspontos.login(data.login,data.password).subscribe( usuario => {
+              console.log('usuario: '+JSON.stringify(usuario));
+              if (usuario == null) {
+                this.user = null;
+                this.logado = false;
+                this.login();
+              } else {
+                this.setLocalData(JSON.stringify(usuario.id));
+                this.getLocalData().then((value) => {
+                  console.log('cicoId: ', value);});
+                this.user = usuario;
+                this.logado = true;
+              }
+            });
           }
         }
       ]
@@ -148,6 +197,7 @@ export class MapaPage implements OnInit {
                 ponto.phone+'</br>'+
                 this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
               '</div>'+
+              '<div id="tap">adicionar fotos</div>'+
             '</div>'
           );
         });
@@ -165,7 +215,17 @@ export class MapaPage implements OnInit {
     });
     marker.addListener('click', function() {
       infoWindow.open(map,marker);
-    })
+
+      google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+        document.getElementById('tap').addEventListener('click', () => {
+          alert('Clicked');
+          //this.addPicture();
+          console.log("touch");
+          //this.closeInfoViewWindow(infoWindow);
+          //this.openEventDetailModal(event);
+        });
+      });
+    });
   }
 
   private addMaker(lat: number, lng: number, lbl: string, ico: string, drag) {
@@ -247,7 +307,7 @@ export class MapaPage implements OnInit {
     this.nativeGeocoder.reverseGeocode(lat, lng, this.options)
     .then((result: NativeGeocoderReverseResult[]) => {
       endereco = JSON.stringify(result[0]);
-      console.log(JSON.stringify(result[0]));
+      console.log('endereco: '+endereco);
     })
     .catch((error: any) => console.log("error: "+error));
     console.log('endereco: '+endereco)
@@ -365,4 +425,20 @@ export class MapaPage implements OnInit {
     return await alert.present();
   }
 
+  private addPicture() {
+    this.camera.getPicture(this.cameraOptions).then((imageData) => {
+      // imageData is either a base64 encoded string or a file URI
+      // If it's base64 (DATA_URL):
+      let base64Image = 'data:image/jpeg;base64,' + imageData;
+     }, (err) => {
+      // Handle error
+     });
+  }
+
+  getLocalData() {
+    return this.storage.get('cicoId');
+  }
+  setLocalData(id:string){
+    return  this.storage.set('cicoId',id);
+  }
 }

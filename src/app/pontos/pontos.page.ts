@@ -5,6 +5,7 @@ import { MenuController, NavController, PopoverController, AlertController } fro
 import { faCompass, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { PopoverComponent } from '../popover/popover.component';
+import { Storage } from '@ionic/storage';
 
 @Component({
   selector: 'app-pontos',
@@ -31,7 +32,8 @@ export class PontosPage implements OnInit {
     public navCtrl: NavController,
     private geolocation: Geolocation,
     public popoverCtrl: PopoverController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private storage: Storage
   ) { }
 
   ngOnInit(): void {    

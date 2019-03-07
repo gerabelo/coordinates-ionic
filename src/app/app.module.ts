@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouteReuseStrategy } from '@angular/router';
-//import { RouterModule, Routes } from '@angular/router';
+import { RouteReuseStrategy, GuardsCheckEnd } from '@angular/router';
 
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
@@ -19,6 +18,10 @@ import { faCompass, faInfoCircle, faChevronCircleLeft } from '@fortawesome/free-
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { PopoverComponent } from './popover/popover.component';
 
+import { AuthGuardService } from './auth-guard.service';
+
+import { IonicStorageModule } from '@ionic/storage';
+
 library.add(faCompass, faInfoCircle);
 
 @NgModule({
@@ -32,12 +35,17 @@ library.add(faCompass, faInfoCircle);
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    IonicStorageModule.forRoot({
+      name: '__cico',
+         driverOrder: ['indexeddb', 'sqlite', 'websql']
+    })
   ],
   providers: [
     StatusBar,
     SplashScreen,
     Geolocation,
+    AuthGuardService,    
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]

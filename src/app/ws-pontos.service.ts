@@ -5,6 +5,7 @@ import { HttpClient, HttpParams, HttpHeaders, HttpClientModule } from '@angular/
 import { Http, Response, Headers, RequestOptions, URLSearchParams } from '@angular/http';
 import { Observable } from 'rxjs';
 import { Ponto } from './ponto';
+import { User } from './user';
 
 @Injectable({
   providedIn: 'root'
@@ -38,5 +39,35 @@ export class WsPontosService implements OnInit {
     return this.http.post<Ponto>('http://localhost:3000/coordinate/add', ponto, {
       headers: { 'Content-Type': 'application/json' }
     });
+  }
+
+  public login(login: string, password: string) {
+    //let httpParams = new HttpParams();
+    //let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
+    //httpParams.append("id",id); 
+    //httpParams.append("_id",id); 
+    //return this.http.post<Ponto>('http://localhost:3000/coordinate/', { headers: httpHeaders, params: httpParams });
+    return this.http.post<User>('http://localhost:3000/user/login', { login, password });
+    //this.pontos.find(ponto => ponto.id === id)
+  }
+
+  public fast(id: string) {
+    //let httpParams = new HttpParams();
+    //let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
+    //httpParams.append("id",id); 
+    //httpParams.append("_id",id); 
+    //return this.http.post<Ponto>('http://localhost:3000/coordinate/', { headers: httpHeaders, params: httpParams });
+    return this.http.post<User>('http://localhost:3000/user/fast', { id });
+    //this.pontos.find(ponto => ponto.id === id)
+  }
+
+  public cadastro(user: User) {
+    //let httpParams = new HttpParams();
+    //let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
+    //httpParams.append("id",id); 
+    //httpParams.append("_id",id); 
+    //return this.http.post<Ponto>('http://localhost:3000/coordinate/', { headers: httpHeaders, params: httpParams });
+    return this.http.post<User>('http://localhost:3000/user/add', { user });
+    //this.pontos.find(ponto => ponto.id === id)
   }
 }

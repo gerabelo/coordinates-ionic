@@ -26,6 +26,3 @@ export class Ponto {
       icon: string;
   }
 }
-
-
-    

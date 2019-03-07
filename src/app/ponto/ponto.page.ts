@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import {Location} from '@angular/common';
+import { AuthGuardService } from '../auth-guard.service';
 
 @Component({
   selector: 'app-ponto',
@@ -35,34 +36,40 @@ export class PontoPage implements OnInit {
     public navCtrl: NavController,
     private activatedRoute: ActivatedRoute,
     private geolocation: Geolocation,
-    private _location: Location
+    private _location: Location,
+    public authGuard: AuthGuardService
   ) { }
 
   ngOnInit() {
-    this.wspontos.getPonto(this.activatedRoute.snapshot.paramMap.get('id')).subscribe(data => {
-      this.ponto = data;
 
-      var p1 = new Promise(async (resolve,reject)=>{
-        this.myLatLng = await this.getLocation();
-        resolve(this.myLatLng);
-        // reject(window.location.reload());
-      });  
-      p1.then(async (value: {lat:number, lng:number})=>{
-          // console.log("value: "+JSON.stringify(value));
-          // console.log("ponto: "+JSON.stringify(data));
-          // console.log("lat lng: "+data.lat+" "+data.lng);
-          // this.distance = await this.geodesicDistance(+data.lat,+data.lng);
-          // console.log("distance: "+this.distance);
-          var p2 = new Promise(async(sucess,fail)=>{
-            var distancia = this.geodesicDistance(+data.lat,+data.lng,+value.lat,+value.lng);
-            sucess(distancia);
-          });
-          p2.then((result)=>{
-            console.log("value:"+result);
-            this.distance = result;
-          });
+    if (this.authGuard.loginState) {
+      this.wspontos.getPonto(this.activatedRoute.snapshot.paramMap.get('id')).subscribe(data => {
+        this.ponto = data;
+  
+        var p1 = new Promise(async (resolve,reject)=>{
+          this.myLatLng = await this.getLocation();
+          resolve(this.myLatLng);
+          // reject(window.location.reload());
+        });  
+        p1.then(async (value: {lat:number, lng:number})=>{
+            // console.log("value: "+JSON.stringify(value));
+            // console.log("ponto: "+JSON.stringify(data));
+            // console.log("lat lng: "+data.lat+" "+data.lng);
+            // this.distance = await this.geodesicDistance(+data.lat,+data.lng);
+            // console.log("distance: "+this.distance);
+            var p2 = new Promise(async(sucess,fail)=>{
+              var distancia = this.geodesicDistance(+data.lat,+data.lng,+value.lat,+value.lng);
+              sucess(distancia);
+            });
+            p2.then((result)=>{
+              console.log("value:"+result);
+              this.distance = result;
+            });
+        });
       });
-    });
+    } else {
+      this.goToMapa();      
+    }
   }
   goback() {
     // this.navCtrl.navigateBack;

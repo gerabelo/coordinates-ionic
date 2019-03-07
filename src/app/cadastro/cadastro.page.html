@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-grid no-padding>
+      <ion-row class="title">
+          <ion-col class="left">
+            <!-- <ion-button fill="clear" color="white" block >
+              <fa-icon [icon]="faInfoCircle" size="2x"></fa-icon>
+            </ion-button> -->
+          </ion-col>
+          <ion-col size="auto" style="padding-top: 19px;">
+            Cidade Coletiva
+          </ion-col>
+          <ion-col class="right">
+            <!-- <ion-button fill="clear" color="white">
+                <fa-icon [icon]="faBars" size="2x"></fa-icon>
+            </ion-button> -->
+          </ion-col>
+        </ion-row>  
+  </ion-grid>
+</ion-header>
+
+<ion-content padding>
+<ion-grid>
+  <ion-row>
+      <form (ngSubmit)="cadastro()">
+          <ion-item>
+              <ion-input type="text" [(ngModel)]="newUser.login" name="login" placeholder="login"></ion-input>
+          </ion-item>
+          <ion-item>
+              <ion-input type="password" [(ngModel)]="newUser.password" name="password" placeholder="password"></ion-input>
+          </ion-item>
+          <ion-item>
+              <ion-input type="text" [(ngModel)]="newUser.full_name" name="full_name" placeholder="nome completo"></ion-input>
+          </ion-item>
+          <ion-item>
+              <ion-input type="email" [(ngModel)]="newUser.email" name="email" placeholder="email"></ion-input>
+          </ion-item>
+          <ion-item>
+              <ion-input type="tel" [(ngModel)]="newUser.phone" name="phone" placeholder="phone"></ion-input>
+          </ion-item>
+          <!-- <button ion-button type="submit" block>Cadastrar</button> -->
+          <ion-button fill="clear" color="white" block (click)="cadastro()">
+              Cadastrar
+          </ion-button>
+        </form>
+  </ion-row>
+</ion-grid>
+</ion-content>
