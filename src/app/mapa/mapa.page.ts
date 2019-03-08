@@ -15,6 +15,7 @@ import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
 import { Storage } from '@ionic/storage';
 import { User } from '../user';
 import { Observable } from 'rxjs';
+import { AuthGuardService } from '../auth-guard.service';
 
 declare var google;
 
@@ -67,27 +68,50 @@ export class MapaPage implements OnInit {
     private alertCtrl: AlertController,
     private nativeGeocoder: NativeGeocoder,
     private camera: Camera,
-    private storage: Storage
+    private storage: Storage,
+    public global: AuthGuardService
   ) { }
 
-  ngOnInit() {
-    //this.login();
+  ionViewDidEnter() {
     this.getLocalData().then((value) => {
-      console.log('cicoId: ', value);
+      console.log('cico: ', value);
       if (value == null) {
         this.user = null;
+        this.global.setUser(null);
         this.logado = false;
         this.login();        
       } else {
-        this.wspontos.fast(value).subscribe(usuario => {
-          this.user = usuario;
-        })
+        // this.wspontos.fast(value.id).subscribe(usuario => {
+        //   this.user = usuario;
+        // })
+        this.user = JSON.parse(value);
+        this.global.setUser(JSON.parse(value));
         this.logado = true;
       }      
     }).catch((err) => {
       this.logado = false;
       this.login();              
     });
+  }
+
+  ngOnInit() {
+    // //this.login();
+    // this.getLocalData().then((value) => {
+    //   console.log('cicoId: ', value);
+    //   if (value == null) {
+    //     this.user = null;
+    //     this.logado = false;
+    //     this.login();        
+    //   } else {
+    //     this.wspontos.fast(value).subscribe(usuario => {
+    //       this.user = usuario;
+    //     })
+    //     this.logado = true;
+    //   }      
+    // }).catch((err) => {
+    //   this.logado = false;
+    //   this.login();              
+    // });
     this.wspontos.getPontos().subscribe(data => {
       this.pontos = data;
     });
@@ -120,7 +144,7 @@ export class MapaPage implements OnInit {
           role: 'cancel',
           cssClass: 'alert-cancel',
           handler: () => {
-            this.logado = true;
+            //this.logado = true;
             this.navCtrl.navigateForward('/cadastro');
           }
         },
@@ -147,13 +171,15 @@ export class MapaPage implements OnInit {
               console.log('usuario: '+JSON.stringify(usuario));
               if (usuario == null) {
                 this.user = null;
+                this.global.setUser(null);
                 this.logado = false;
                 this.login();
               } else {
-                this.setLocalData(JSON.stringify(usuario.id));
+                this.setLocalData(JSON.stringify(usuario));
                 this.getLocalData().then((value) => {
-                  console.log('cicoId: ', value);});
+                  console.log('cico: ', value);});
                 this.user = usuario;
+                this.global.setUser(usuario);
                 this.logado = true;
               }
             });
@@ -436,9 +462,10 @@ export class MapaPage implements OnInit {
   }
 
   getLocalData() {
-    return this.storage.get('cicoId');
+    return this.storage.get('cico');
   }
-  setLocalData(id:string){
-    return  this.storage.set('cicoId',id);
+
+  setLocalData(user: string){
+    return  this.storage.set('cico',user);
   }
 }
