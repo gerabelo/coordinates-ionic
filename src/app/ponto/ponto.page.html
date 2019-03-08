@@ -1,60 +1,59 @@
 <ion-header>
-<<<<<<< HEAD
-</ion-header>
-
-<ion-content>
-  <ion-grid>
-    <ion-row class="title">
-        <ion-col class="left">
-          <fa-icon [icon]="faChevronCircleLeft" size="2x"></fa-icon>
-        </ion-col>
-        <ion-col size="auto" style="padding-top: 19px;">
-          Cidade Coletiva
-        </ion-col>
-        <ion-col class="right">
-          <fa-icon [icon]="faCompass" size="2x"></fa-icon>
-        </ion-col>
-    </ion-row>
-=======
     <ion-grid no-padding>
         <ion-row class="title">
             <ion-col class="left">
-              <fa-icon [icon]="faChevronCircleLeft" size="2x" (click)="goback()" ></fa-icon>
+              <ion-button fill="clear" color="white" block (click)="goBack()">
+                <fa-icon [icon]="faChevronCircleLeft" size="2x" (click)="goback()" ></fa-icon>
+              </ion-button>
             </ion-col>
             <ion-col size="auto" style="padding-top: 19px;">
               Cidade Coletiva
             </ion-col>
             <ion-col class="right">
-              <fa-icon [icon]="faCompass" size="2x"></fa-icon>
+              <ion-button fill="clear" color="white" block (click)="goToMapa()">
+                <fa-icon [icon]="faCompass" size="2x"></fa-icon>
+              </ion-button>
             </ion-col>
         </ion-row>
     </ion-grid>
 </ion-header>
 <ion-content>
   <ion-grid>
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
-    <ion-row>
+    <ion-row no-padding>
       <ion-col class="description">
         {{ponto.description}}
+      </ion-col>
+      <ion-col class="distance">
+        {{distance}}m
+      </ion-col>
+    </ion-row>
+    <ion-row class="data-all" *ngIf="ponto.phone">
+      <ion-col class="data-left" size="40%"><fa-icon [icon]="faPhone" color="green"></fa-icon></ion-col>
+      <ion-col class="data">{{ponto.phone}}</ion-col>
+      <ion-col class="right">
+        <button class="data-button" (click)="ligar()">
+        ligar
+        </button>
       </ion-col>
     </ion-row>
 <<<<<<< HEAD
     <ion-row class="data-all">
 =======
-    <ion-row class="data-all" *ngIf="ponto.phone">
->>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
-      <ion-col class="data-left" size="40%"><fa-icon [icon]="faPhone" color="green"></fa-icon></ion-col>
-      <ion-col class="data">{{ponto.phone}}</ion-col>
-      <ion-col></ion-col>
-    </ion-row>
-<<<<<<< HEAD
-    <ion-row class="data-all">
-=======
     <ion-row class="data-all" *ngIf="ponto.address">
+<<<<<<< HEAD
 >>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
       <ion-col class="data-left" size="40%"><fa-icon [icon]="faMapMarker" color="#019879"></fa-icon></ion-col>
+=======
+      <ion-col class="data-left" size="40%">
+        <fa-icon [icon]="faMapMarker" color="#019879"></fa-icon>
+      </ion-col>
+>>>>>>> b4ad784682f57815f4c52b9f4766939579bb139a
       <ion-col class="data">{{ponto.address}}</ion-col>
-      <ion-col></ion-col>
+      <ion-col class="right">
+          <button class="data-button" block (click)="verNoMapa()">
+              ver no mapa
+          </button>
+      </ion-col>
     </ion-row>
 <<<<<<< HEAD
     <ion-row class="data-all">
@@ -63,12 +62,20 @@
 >>>>>>> 47eaa016899c9598c7f1582eff4a060f20e93bbf
       <ion-col class="data-left" size="40%"><fa-icon [icon]="faDesktop" color="#019879"></fa-icon></ion-col>
       <ion-col class="data">{{ponto.website}}</ion-col>
-      <ion-col></ion-col>
+      <ion-col class="right" >
+          <button class="data-button" block (click)="goToWebsite()">
+              ir para o site
+          </button>
+      </ion-col>
     </ion-row>
     <ion-row class="data-all">
         <ion-col class="data-left" size="40%"><fa-icon [icon]="faRecycle" color="#019879"></fa-icon></ion-col>
         <ion-col class="data">Materiais aceitos</ion-col>
-        <ion-col></ion-col>
+        <ion-col class="right">
+            <button class="data-button" block (click)="verificar()">
+                verificar
+            </button>
+        </ion-col>
       </ion-row>    
   </ion-grid>
 </ion-content>

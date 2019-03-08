@@ -1,6 +1,11 @@
 @import url(https://fonts.googleapis.com/css?family=Montserrat);
 $font-family-base: "Montserrat", sans-serif !default;
 
+ion-button {
+    text-decoration: none;
+    color: #FFF;
+}
+
 ion-content {
     font-family: 'Montserrat', sans-serif;
 }
@@ -57,41 +62,79 @@ ul > li {
 .description {
     background-color: #DDD;
     height: 50px;
+    margin: 0px !important;
     padding-top: 15px;
     padding-left: 30px;
-    margin: 0 auto;
     text-align: left;
     font-weight: bold;
-    font-size: 16pt;
+    font-size: 16pt;    
 }
 
 .data-left  {
-    padding-top: 20px;
+    // padding-top: 20px;
     padding-left:40px;
-    text-align: left;
-    height: 40px;
+    // text-align: left;
+    height: 60px;
+    display: flex;
+    align-content: center;
+    align-items: center;    
 }
 
 .data {
-    padding-top: 20px;
+    // padding-top: 20px;
+    // padding-bottom: 10px;
     // padding-left:40px;
     text-align: left;
-    height: 40px;
+    height: 60px;
+    // line-height: 30px;
+    vertical-align: middle;
+    display: flex;
+    align-content: center;
+    align-items: center;
 }
 
 .data-all {
     padding-top: 12px;
     margin: 0 auto;
     width: 100%;
-    height: 40px;
+    height: 100%px;
     text-align: center;
     font-family: 'Montserrat', sans-serif;
     font-size: 12pt;
     font-weight: bold;
     color: #019879;
     background-color: #FFF;
+    border-bottom: 1px solid #AAA;
 }
 
 .no-padding {
     padding: 0px !important;
+}
+
+.data-button {
+    width: 80%;
+    height: 100%;
+    background-color: #019879;
+    color: #FFF;
+    border-radius: 8px;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12pt;
+    font-weight: normal;
+    // display: flex;
+    // align-content: center;
+    // align-items: center;
+}
+
+.distance {
+    background-color: #DDD;
+    height: 50px;
+    margin: 0px !important;
+    padding-top: 15px;
+    padding-left: 30px;
+    padding-right: 30px;
+    text-align: right;
+    font-weight: bold;
+    font-size: 16pt;
+    color: #019879;
 }

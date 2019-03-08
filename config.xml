@@ -86,6 +86,8 @@
         <variable name="GEOLOCATION_USAGE_DESCRIPTION" value="tracking" />
     </plugin>
     <edit-config file="*-Info.plist" mode="merge" target="NSLocationWhenInUseUsageDescription">
-    <string>This App wants to track your location</string>
+        <string>This App wants to track your location</string>
     </edit-config>
+    <plugin name="cordova-plugin-camera" spec="4.0.3" />
+    <engine name="android" spec="~7.1.4" />
 </widget>
