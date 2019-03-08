@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { User } from '../User'
+import { User } from '../user';
 import { WsPontosService } from '../ws-pontos.service';
 import {Md5} from 'ts-md5/dist/md5';
 import { NavController } from '@ionic/angular';
