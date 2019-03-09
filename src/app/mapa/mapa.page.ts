@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
 import { LoadingController, PopoverController } from '@ionic/angular';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop, faBars } from '@fortawesome/free-solid-svg-icons';
 import { WsPontosService } from '../ws-pontos.service';
@@ -11,11 +11,12 @@ import { Placeholder } from '@angular/compiler/src/i18n/i18n_ast';
 import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
 import { stringify } from '@angular/core/src/util';
 import { logging } from 'protractor';
-import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
+//import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
 import { Storage } from '@ionic/storage';
 import { User } from '../user';
 import { Observable } from 'rxjs';
 import { AuthGuardService } from '../auth-guard.service';
+import { map, filter, scan } from 'rxjs/operators';
 
 declare var google;
 
@@ -38,10 +39,12 @@ export class MapaPage implements OnInit {
   faDesktop = faDesktop;
   faBars = faBars;
 
-  logado = false;
+  //logado = false;
   mapRef = null;
   myLatLng = null;
   myMark = null;
+  lat
+  lng 
   // myLatLng: {
   //   lat: number,
   //   lng: number
@@ -52,12 +55,12 @@ export class MapaPage implements OnInit {
     maxResults: 5
   };
 
-  cameraOptions: CameraOptions = {
-    quality: 100,
-    destinationType: this.camera.DestinationType.FILE_URI,
-    encodingType: this.camera.EncodingType.JPEG,
-    mediaType: this.camera.MediaType.PICTURE
-  }
+  // cameraOptions: CameraOptions = {
+  //   quality: 100,
+  //   destinationType: this.camera.DestinationType.FILE_URI,
+  //   encodingType: this.camera.EncodingType.JPEG,
+  //   mediaType: this.camera.MediaType.PICTURE
+  // }
 
   constructor(
     private geolocation: Geolocation,
@@ -67,18 +70,20 @@ export class MapaPage implements OnInit {
     public popoverCtrl: PopoverController,
     private alertCtrl: AlertController,
     private nativeGeocoder: NativeGeocoder,
-    private camera: Camera,
+    //private camera: Camera,
     private storage: Storage,
     public global: AuthGuardService
   ) { }
 
-  ionViewDidEnter() {
+  // ionViewDidEnter() {
+  //  ionViewDidLoad() {
+    ngAfterViewInit() {
     this.getLocalData().then((value) => {
       console.log('cico: ', value);
       if (value == null) {
         this.user = null;
         this.global.setUser(null);
-        this.logado = false;
+        //this.logado = false;
         this.login();        
       } else {
         // this.wspontos.fast(value.id).subscribe(usuario => {
@@ -86,10 +91,10 @@ export class MapaPage implements OnInit {
         // })
         this.user = JSON.parse(value);
         this.global.setUser(JSON.parse(value));
-        this.logado = true;
+        //this.logado = true;
       }      
     }).catch((err) => {
-      this.logado = false;
+      //this.logado = false;
       this.login();              
     });
   }
@@ -115,7 +120,8 @@ export class MapaPage implements OnInit {
     this.wspontos.getPontos().subscribe(data => {
       this.pontos = data;
     });
-    this.addPicture();
+    //this.addPicture();
+    //this.loadMap_old();
     this.loadMap();
   }
 
@@ -172,7 +178,7 @@ export class MapaPage implements OnInit {
               if (usuario == null) {
                 this.user = null;
                 this.global.setUser(null);
-                this.logado = false;
+                //this.logado = false;
                 this.login();
               } else {
                 this.setLocalData(JSON.stringify(usuario));
@@ -180,7 +186,7 @@ export class MapaPage implements OnInit {
                   console.log('cico: ', value);});
                 this.user = usuario;
                 this.global.setUser(usuario);
-                this.logado = true;
+                //this.logado = true;
               }
             });
           }
@@ -193,15 +199,127 @@ export class MapaPage implements OnInit {
   async loadMap() {
     const loading = await this.loadingCtrl.create();
     loading.present();
+    let watchOptions = {
+      timeout : 30000,
+      maxAge: 0,
+      enableHighAccuracy: true
+    };
+
+    var watchID = navigator.geolocation.watchPosition((position) => {
+///
+      if ((position as Geoposition).coords != undefined) {
+        var geoposition = (position as Geoposition);
+        console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
+      }
+      this.setLatLng(geoposition.coords.latitude,geoposition.coords.longitude);
+      const mapEle: HTMLElement = document.getElementById('map');
+      this.mapRef = new google.maps.Map(mapEle, {
+        center: {lat: geoposition.coords.latitude, lng: geoposition.coords.longitude},
+        zoom: 15
+      });
+
+      google.maps.event
+      .addListenerOnce(this.mapRef, 'idle', () => {
+        loading.dismiss();
+        if (this.pontos.length) {
+          this.pontos.forEach(ponto => {
+            this.addInfoWindow(
+              this.mapRef,
+              //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
+              this.addMaker(+ponto.lat,+ponto.lng,null,ponto.type.icon,false),
+              // '<div id="infoWindow-'+ponto.type.id+'">'+
+              '<div id="content">'+
+                '<div id="siteNotice">'+
+                '</div>'+
+                '<h1 id="firstHeading" class="firstHeading">'+ponto.description+'</h1>'+
+                '<div id="bodyContent">'+
+                  '<p>'+ponto.address+'</br>'+
+                  ponto.phone+'</br>'+
+                  this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
+                '</div>'+
+                '<div id="tap">adicionar fotos</div>'+
+                '</div>'
+              );
+            });
+          }      
+          console.log('lat: '+this.lat+' lng: '+this.lng);
+          this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
+          this.pickUp(this.myMark);
+      });
+///
+      navigator.geolocation.clearWatch(watchID);
+    }, null , { enableHighAccuracy: true });
+    // navigator.geolocation.clearWatch(watchID);
+  }
+
+  async loadMap_new() {
+    const loading = await this.loadingCtrl.create();
+    loading.present();
+    let watchOptions = {
+      timeout : 30000,
+      maxAge: 0,
+      enableHighAccuracy: true
+    };
+
+    var watch = this.geolocation.watchPosition(watchOptions)
+    .pipe(filter((p) => p.coords !== undefined)) //Filter Out Errors
+    .subscribe((data) => {
+      if ((data as Geoposition).coords != undefined) {
+        var geoposition = (data as Geoposition);
+        //this.myLatLng = { lat: geoposition.coords.latitude, lng: geoposition.coords.longitude }
+        console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
+      }
+      this.setLatLng(geoposition.coords.latitude,geoposition.coords.longitude);
+
+      // console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
+      const mapEle: HTMLElement = document.getElementById('map');
+      this.mapRef = new google.maps.Map(mapEle, {
+        center: {lat: geoposition.coords.latitude, lng: geoposition.coords.longitude},
+        zoom: 15
+      });
+
+      google.maps.event
+      .addListenerOnce(this.mapRef, 'idle', () => {
+        loading.dismiss();
+        if (this.pontos.length) {
+          this.pontos.forEach(ponto => {
+            this.addInfoWindow(
+              this.mapRef,
+              //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
+              this.addMaker(+ponto.lat,+ponto.lng,null,ponto.type.icon,false),
+              // '<div id="infoWindow-'+ponto.type.id+'">'+
+              '<div id="content">'+
+                '<div id="siteNotice">'+
+                '</div>'+
+                '<h1 id="firstHeading" class="firstHeading">'+ponto.description+'</h1>'+
+                '<div id="bodyContent">'+
+                  '<p>'+ponto.address+'</br>'+
+                  ponto.phone+'</br>'+
+                  this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
+                '</div>'+
+                '<div id="tap">adicionar fotos</div>'+
+                '</div>'
+              );
+            });
+          }      
+          console.log('lat: '+this.lat+' lng: '+this.lng);
+          this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
+          this.pickUp(this.myMark);
+        });
+      });
+  }
+
+  async loadMap_old() {
+    const loading = await this.loadingCtrl.create();
+    loading.present();
     try {
-      this.myLatLng = await this.getLocation();
+      this.myLatLng = await this.getLocation_old();
     } finally {
       const mapEle: HTMLElement = document.getElementById('map');
       this.mapRef = new google.maps.Map(mapEle, {
         center: this.myLatLng,
         zoom: 15
-      });
-      
+      });      
     }
     
     google.maps.event
@@ -227,9 +345,8 @@ export class MapaPage implements OnInit {
             '</div>'
           );
         });
-      }
-      
-      
+      }      
+    
       this.myMark = this.addMaker(this.myLatLng.lat, this.myLatLng.lng,null,"assets/icon/mylocation.png",true);
       this.pickUp(this.myMark);
     });
@@ -270,7 +387,7 @@ export class MapaPage implements OnInit {
     return marker;
   }
 
-  private async getLocation() {
+  private async getLocation_old() {
     const rta = await this.geolocation.getCurrentPosition();
     return {
       lat: rta.coords.latitude,
@@ -278,12 +395,89 @@ export class MapaPage implements OnInit {
     };
   }
 
+  private async getLocation() {
+    const loading = await this.loadingCtrl.create();
+    loading.present();
+    let watchOptions = {
+      timeout : 30000,
+      maxAge: 0,
+      enableHighAccuracy: true
+    };
+
+    const watch = this.geolocation.watchPosition(watchOptions)
+    .pipe(filter((p) => p.coords !== undefined)) //Filter Out Errors
+    .subscribe((data) => {
+      if ((data as Geoposition).coords != undefined) {
+        var geoposition = (data as Geoposition);
+        //this.myLatLng = { lat: geoposition.coords.latitude, lng: geoposition.coords.longitude }
+        console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
+      }
+      this.setLatLng(geoposition.coords.latitude,geoposition.coords.longitude);
+      this.myLatLng = {lat:geoposition.coords.latitude, lng: geoposition.coords.longitude }  
+      this.lat = geoposition.coords.latitude;
+      this.lng = geoposition.coords.longitude;
+      // console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
+      const mapEle: HTMLElement = document.getElementById('map');
+      this.mapRef = new google.maps.Map(mapEle, {
+        center: {lat: geoposition.coords.latitude, lng: geoposition.coords.longitude},
+        zoom: 15
+      });
+
+      
+      google.maps.event
+      .addListenerOnce(this.mapRef, 'idle', () => {
+        loading.dismiss();
+        if (this.pontos.length) {
+          this.pontos.forEach(ponto => {
+            this.addInfoWindow(
+              this.mapRef,
+              //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
+              this.addMaker(+ponto.lat,+ponto.lng,null,ponto.type.icon,false),
+              // '<div id="infoWindow-'+ponto.type.id+'">'+
+              '<div id="content">'+
+                '<div id="siteNotice">'+
+                '</div>'+
+              '<h1 id="firstHeading" class="firstHeading">'+ponto.description+'</h1>'+
+              '<div id="bodyContent">'+
+                '<p>'+ponto.address+'</br>'+
+                ponto.phone+'</br>'+
+                this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
+              '</div>'+
+              '<div id="tap">adicionar fotos</div>'+
+            '</div>'
+          );
+        });
+      }      
+      console.log('lat: '+this.lat+' lng: '+this.lng);
+      this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
+      this.pickUp(this.myMark);
+    });
+
+
+    });
+
+      
+    //   // // data can be a set of coordinates, or an error (if an error occurred).
+      // // data.coords.latitude
+      // // data.coords.longitude
+
+      // console.log("data.coords.latitude: "+data.coords.latitude);
+      // return { lat: data.coords.latitude, lng: data.coords.longitude }
+      // // latitude = data.coords.latitude;
+      // // longitude = data.coords.longitude;
+  
+  }
+
   private geodesicDistance(lat: number,lng: number) {
     var R = 6371000; // metres
     var φ1 = this.toRad(lat);
-    var φ2 = this.toRad(+this.myLatLng.lat);
-    var Δφ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lat)-this.toRad(lat),2));
-    var Δλ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lng)-this.toRad(lng),2));
+    // var φ2 = this.toRad(+this.myLatLng.lat);
+    var φ2 = this.toRad(+this.lat);
+    // var Δφ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lat)-this.toRad(lat),2));
+    // var Δλ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lng)-this.toRad(lng),2));
+    var Δφ = Math.sqrt(Math.pow(this.toRad(+this.lat)-this.toRad(lat),2));
+    var Δλ = Math.sqrt(Math.pow(this.toRad(+this.lng)-this.toRad(lng),2));
+    
     var a = Math.sin(Δφ/2)*Math.sin(Δφ/2)+Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)*Math.sin(Δλ/2);
     var c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     var d = (R * c).toFixed(1);
@@ -451,15 +645,15 @@ export class MapaPage implements OnInit {
     return await alert.present();
   }
 
-  private addPicture() {
-    this.camera.getPicture(this.cameraOptions).then((imageData) => {
-      // imageData is either a base64 encoded string or a file URI
-      // If it's base64 (DATA_URL):
-      let base64Image = 'data:image/jpeg;base64,' + imageData;
-     }, (err) => {
-      // Handle error
-     });
-  }
+  // private addPicture() {
+  //   this.camera.getPicture(this.cameraOptions).then((imageData) => {
+  //     // imageData is either a base64 encoded string or a file URI
+  //     // If it's base64 (DATA_URL):
+  //     let base64Image = 'data:image/jpeg;base64,' + imageData;
+  //    }, (err) => {
+  //     // Handle error
+  //    });
+  // }
 
   getLocalData() {
     return this.storage.get('cico');
@@ -467,5 +661,14 @@ export class MapaPage implements OnInit {
 
   setLocalData(user: string){
     return  this.storage.set('cico',user);
+  }
+
+  setLatLng(lat,lng) {
+    this.lat = lat;
+    this.lng = lng;
+  }
+
+  getLat() {
+    return this.lat;
   }
 }

@@ -13,7 +13,7 @@ export class WsPontosService implements OnInit {
   public urlBase: string = '';
 
   constructor(public http: HttpClient) {
-    this.urlBase = 'http://192.168.0.7:3000';
+    this.urlBase = 'http://192.168.1.4:3000';
   }
 
   ngOnInit(){}
@@ -21,7 +21,7 @@ export class WsPontosService implements OnInit {
   public getPontos(): Observable<Ponto[]> {
     let httpParams = new HttpParams();
     let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
-    return this.http.get<Ponto[]>(`http://192.168.0.7:3000/coordinate/`, { headers: httpHeaders});
+    return this.http.get<Ponto[]>(`http://192.168.1.4:3000/coordinate/`, { headers: httpHeaders});
   }
 
   public getPonto(id: string) {
@@ -29,8 +29,8 @@ export class WsPontosService implements OnInit {
     //let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
     //httpParams.append("id",id); 
     //httpParams.append("_id",id); 
-    //return this.http.post<Ponto>('http://192.168.0.7:3000/coordinate/', { headers: httpHeaders, params: httpParams });
-    return this.http.post<Ponto>(`http://192.168.0.7:3000/coordinate`, { id });
+    //return this.http.post<Ponto>('http://192.168.1.4:3000/coordinate/', { headers: httpHeaders, params: httpParams });
+    return this.http.post<Ponto>(`http://192.168.1.4:3000/coordinate`, { id });
     //this.pontos.find(ponto => ponto.id === id)
   }
 
@@ -39,7 +39,7 @@ export class WsPontosService implements OnInit {
     //let httpHeaders = new HttpHeaders({'Content-Type': 'application/json' });
     console.log('ponto: '+JSON.stringify(ponto));
     data = JSON.stringify(ponto);
-    return this.http.post<Ponto>(`http://192.168.0.7:3000/coordinate/add`, ponto, {
+    return this.http.post<Ponto>(`http://192.168.1.4:3000/coordinate/add`, ponto, {
       headers: { 'Content-Type': 'application/json' }
     });
   }
@@ -49,8 +49,8 @@ export class WsPontosService implements OnInit {
     //let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
     //httpParams.append("id",id); 
     //httpParams.append("_id",id); 
-    //return this.http.post<Ponto>('http://192.168.0.7:3000/coordinate/', { headers: httpHeaders, params: httpParams });
-    return this.http.post<User>(`http://192.168.0.7:3000/user/login`, { login, password });
+    //return this.http.post<Ponto>('http://192.168.1.4:3000/coordinate/', { headers: httpHeaders, params: httpParams });
+    return this.http.post<User>(`http://192.168.1.4:3000/user/login`, { login, password });
     //this.pontos.find(ponto => ponto.id === id)
   }
 
@@ -59,8 +59,8 @@ export class WsPontosService implements OnInit {
     //let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
     //httpParams.append("id",id); 
     //httpParams.append("_id",id); 
-    //return this.http.post<Ponto>('http://192.168.0.7:3000/coordinate/', { headers: httpHeaders, params: httpParams });
-    return this.http.post<User>(`http://192.168.0.7:3000/user/fast`, { id });
+    //return this.http.post<Ponto>('http://192.168.1.4:3000/coordinate/', { headers: httpHeaders, params: httpParams });
+    return this.http.post<User>(`http://192.168.1.4:3000/user/fast`, { id });
     //this.pontos.find(ponto => ponto.id === id)
   }
 
@@ -69,8 +69,8 @@ export class WsPontosService implements OnInit {
     //let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
     //httpParams.append("id",id); 
     //httpParams.append("_id",id); 
-    //return this.http.post<Ponto>('http://192.168.0.7:3000/coordinate/', { headers: httpHeaders, params: httpParams });
-    return this.http.post<User>(`http://192.168.0.7:3000/user/add`, { user });
+    //return this.http.post<Ponto>('http://192.168.1.4:3000/coordinate/', { headers: httpHeaders, params: httpParams });
+    return this.http.post<User>(`http://192.168.1.4:3000/user/add`, { user });
     //this.pontos.find(ponto => ponto.id === id)
   }
 }
