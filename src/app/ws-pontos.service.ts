@@ -4,6 +4,7 @@ import { HttpClient, HttpParams, HttpHeaders, HttpClientModule } from '@angular/
 import { Observable } from 'rxjs';
 import { Ponto } from './ponto';
 import { User } from './user';
+import { Type } from './type';
 
 @Injectable({
   providedIn: 'root'
@@ -13,15 +14,21 @@ export class WsPontosService implements OnInit {
   public urlBase: string = '';
 
   constructor(public http: HttpClient) {
-    this.urlBase = 'http://192.168.1.4:3000';
+    this.urlBase = 'http://192.168.0.111:3000';
   }
 
-  ngOnInit(){}
+  ngOnInit() {}
 
+  public getTypes(): Observable<Type[]> {
+    let httpParams = new HttpParams();
+    let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
+    return this.http.get<Type[]>(this.urlBase+`/type/`, { headers: httpHeaders});
+  }
+  
   public getPontos(): Observable<Ponto[]> {
     let httpParams = new HttpParams();
     let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
-    return this.http.get<Ponto[]>(`http://192.168.1.4:3000/coordinate/`, { headers: httpHeaders});
+    return this.http.get<Ponto[]>(this.urlBase+`/coordinate/`, { headers: httpHeaders});
   }
 
   public getPonto(id: string) {
@@ -30,7 +37,7 @@ export class WsPontosService implements OnInit {
     //httpParams.append("id",id); 
     //httpParams.append("_id",id); 
     //return this.http.post<Ponto>('http://192.168.1.4:3000/coordinate/', { headers: httpHeaders, params: httpParams });
-    return this.http.post<Ponto>(`http://192.168.1.4:3000/coordinate`, { id });
+    return this.http.post<Ponto>(this.urlBase+`/coordinate`, { id });
     //this.pontos.find(ponto => ponto.id === id)
   }
 
@@ -39,7 +46,7 @@ export class WsPontosService implements OnInit {
     //let httpHeaders = new HttpHeaders({'Content-Type': 'application/json' });
     console.log('ponto: '+JSON.stringify(ponto));
     data = JSON.stringify(ponto);
-    return this.http.post<Ponto>(`http://192.168.1.4:3000/coordinate/add`, ponto, {
+    return this.http.post<Ponto>(this.urlBase+`/coordinate/add`, ponto, {
       headers: { 'Content-Type': 'application/json' }
     });
   }
@@ -50,7 +57,7 @@ export class WsPontosService implements OnInit {
     //httpParams.append("id",id); 
     //httpParams.append("_id",id); 
     //return this.http.post<Ponto>('http://192.168.1.4:3000/coordinate/', { headers: httpHeaders, params: httpParams });
-    return this.http.post<User>(`http://192.168.1.4:3000/user/login`, { login, password });
+    return this.http.post<User>(this.urlBase+`/user/login`, { login, password });
     //this.pontos.find(ponto => ponto.id === id)
   }
 
@@ -60,7 +67,7 @@ export class WsPontosService implements OnInit {
     //httpParams.append("id",id); 
     //httpParams.append("_id",id); 
     //return this.http.post<Ponto>('http://192.168.1.4:3000/coordinate/', { headers: httpHeaders, params: httpParams });
-    return this.http.post<User>(`http://192.168.1.4:3000/user/fast`, { id });
+    return this.http.post<User>(this.urlBase+`/user/fast`, { id });
     //this.pontos.find(ponto => ponto.id === id)
   }
 
@@ -70,7 +77,7 @@ export class WsPontosService implements OnInit {
     //httpParams.append("id",id); 
     //httpParams.append("_id",id); 
     //return this.http.post<Ponto>('http://192.168.1.4:3000/coordinate/', { headers: httpHeaders, params: httpParams });
-    return this.http.post<User>(`http://192.168.1.4:3000/user/add`, { user });
+    return this.http.post<User>(this.urlBase+`/user/add`, { user });
     //this.pontos.find(ponto => ponto.id === id)
   }
 }
