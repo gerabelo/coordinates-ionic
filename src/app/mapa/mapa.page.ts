@@ -105,27 +105,10 @@ export class MapaPage implements OnInit {
   }
 
   ngOnInit() {
-    // //this.login();
-    // this.getLocalData().then((value) => {
-    //   console.log('cicoId: ', value);
-    //   if (value == null) {
-    //     this.user = null;
-    //     this.logado = false;
-    //     this.login();        
-    //   } else {
-    //     this.wspontos.fast(value).subscribe(usuario => {
-    //       this.user = usuario;
-    //     })
-    //     this.logado = true;
-    //   }      
-    // }).catch((err) => {
-    //   this.logado = false;
-    //   this.login();              
-    // });
     this.wspontos.getPontos().subscribe(data => {
       this.pontos = data;
     });
-    this.addPicture();
+    //this.addPicture();
     //this.loadMap_old();
     this.loadMap();
   }
@@ -525,7 +508,6 @@ export class MapaPage implements OnInit {
       lng = marker.position.lng();
       this.sendPointConfirm(lat,lng);
     })
- 
   }
 
   async sendPointConfirm(lat,lng) {
@@ -553,16 +535,16 @@ export class MapaPage implements OnInit {
           placeholder: 'contato',
           type: 'text'
         },
-        {
-          name: 'address',
-          placeholder: 'endereço',
-          type: 'text'
-        },
-        {
-          name: 'website',
-          type: 'url',
-          placeholder: 'website'
-        }
+        // {
+        //   name: 'address',
+        //   placeholder: 'endereço',
+        //   type: 'text'
+        // },
+        // {
+        //   name: 'website',
+        //   type: 'url',
+        //   placeholder: 'website'
+        // }
       ],
       buttons: [
         {
@@ -577,26 +559,10 @@ export class MapaPage implements OnInit {
           text: 'Proximo',
           cssClass: 'alert-ok',
           handler: async data => {
-            console.log('Send clicked');
             var status = 0;
-            // var entradas = [];
-            
-            // type?: TextFieldTypes | 'checkbox' | 'radio';
-            // name?: string;
-            // placeholder?: string;
-            // value?: any;
-            // label?: string;
-            // checked?: boolean;
-            // disabled?: boolean;
-            // id?: string;
-            // handler?: (input: AlertInput) => void;
-            // min?: string | number;
-            // max?: string | number;
               this.wspontos.getTypes().subscribe(async types => {
                 this.tipos = types;
                 var alertInputs: AlertInput[] = [];
-                // console.log('data: '+JSON.stringify(data));
-                // console.log('this.tipos: '+JSON.stringify(this.tipos));
                 this.tipos.forEach((tipo) => {
                   alertInputs.push({
                     type: "radio",
@@ -611,56 +577,12 @@ export class MapaPage implements OnInit {
                     min: "",
                     max: ""
                   });
-                  // console.log("alertInputs 1: "+JSON.stringify(this.alertInputs));
-                  // console.log("tipo: "+JSON.stringify(tipo));
-              // type?: TextFieldTypes | 'checkbox' | 'radio';
-              // name?: string;
-              // placeholder?: string;
-              // value?: any;
-              // label?: string;
-              // checked?: boolean;
-              // disabled?: boolean;
-              // id?: string;
-              // handler?: (input: AlertInput) => void;
-              // min?: string | number;
-              // max?: string | number;              
-  
-                //   var input = new Entrada(String('type'),String(tipo.description), { String(tipo.id) , String(tipo.icon)}, String(`radio`), false);
-                //   input.name = String('type');
-                //   input.label = String(tipo.description);
-                //   input.value.icon = String(tipo.icon);
-                //   input.value.id = String(tipo.id);
-                //   input.type = String(`radio`);
-                //   input.checked = false;
-                //   alertInputs.push(input);
-                //   console.log('inputs: '+JSON.stringify(input));
                 }); 
                 console.log("alertInputs 1: "+JSON.stringify(alertInputs));
 
                 const alertType = await this.alertCtrl.create({
                   message: `<p class='alert'><b>Informe o Tipo</p>`,
                   inputs: alertInputs,
-                  // inputs: [
-                  //   {
-                  //     name: 'type',
-                  //     label: 'Blue',
-                  //     value: {id: '001', icon: 'assets/icon/recycleBlueMarker.png' },
-                  //     type: 'radio',
-                  //     checked: true
-                  //   },
-                  //   {
-                  //     name: 'type',
-                  //     label: 'Green',
-                  //     value: {id: '002', icon: 'assets/icon/recycleGreenMarker.png' },
-                  //     type: 'radio',
-                  //   },
-                  //   {
-                  //     name: 'type',
-                  //     label: 'Red',
-                  //     value: {id: '003', icon: 'assets/icon/recycleRedMarker.png' },
-                  //     type: 'radio',
-                  //   }
-                  // ],
                   buttons: [
                     {
                       text: 'Cancelar',
