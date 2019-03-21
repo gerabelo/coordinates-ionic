@@ -1,6 +1,6 @@
 export class Type {
     constructor() {}
-    public id: String;
-    public icon: String;
-    public description: String;
+    public _id: string;
+    public icon: string;
+    public description: string;
 }

@@ -7,6 +7,7 @@ import { User } from './user';
 export class AuthGuardService {
   public localUser = new User();
   public loginState:boolean = false;
+
   constructor() { }
 
   setLoginState(value: boolean) {

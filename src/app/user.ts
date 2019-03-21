@@ -13,7 +13,7 @@ export class User {
   //   this.login = login;
   //   this.password = password;
   // }
-  public id: String;
+  public _id: String;
   public username: String;
   public short_name: String;
   public full_name: String;

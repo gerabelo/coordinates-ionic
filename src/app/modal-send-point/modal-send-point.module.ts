@@ -2,14 +2,15 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+
 import { IonicModule } from '@ionic/angular';
-import { MapaPage } from './mapa.page';
+
+import { ModalSendPointPage } from './modal-send-point.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: MapaPage
+    component: ModalSendPointPage
   }
 ];
 
@@ -18,9 +19,8 @@ const routes: Routes = [
     CommonModule,
     FormsModule,
     IonicModule,
-    RouterModule.forChild(routes),
-    FontAwesomeModule,
+    RouterModule.forChild(routes)
   ],
-  declarations: [MapaPage]
+  declarations: [ModalSendPointPage]
 })
-export class MapaPageModule {}
+export class ModalSendPointPageModule {}

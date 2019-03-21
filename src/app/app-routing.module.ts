@@ -22,7 +22,8 @@ const routes: Routes = [
     loadChildren: './pontos/pontos.module#PontosPageModule'
   },
   { path: 'mapa', loadChildren: './mapa/mapa.module#MapaPageModule' },
-  { path: 'cadastro', loadChildren: './cadastro/cadastro.module#CadastroPageModule' }
+  { path: 'cadastro', loadChildren: './cadastro/cadastro.module#CadastroPageModule' },  { path: 'modal-send-point', loadChildren: './modal-send-point/modal-send-point.module#ModalSendPointPageModule' }
+
 ];
 
 @NgModule({

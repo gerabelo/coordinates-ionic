@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-grid no-padding>
+      <ion-row class="title">
+          <ion-col class="left">
+            
+              
+            
+          </ion-col>
+          <ion-col size="auto" style="padding-top: 19px;">
+            Cidade Coletiva
+          </ion-col>
+          <ion-col class="right">
+            
+              
+            
+          </ion-col>
+        </ion-row>  
+  </ion-grid>
+</ion-header>
+<ion-content padding>
+    <form #form="ngForm" (ngSubmit)="startUpload(images)">
+      <h3 *ngIf="images.length == 0" text-center>Nenhuma imagem</h3>
+      <div id="content" *ngIf="images.length > 0">
+      <div>
+      <ion-label>Tipo:</ion-label>
+      <!-- <ion-select ngControl="tipo" placeholder="selecionar tipo" (ngModelChange)="onFormTipoChange()"> -->
+      <!-- <ion-select ng-model="tipoId" placeholder="selecionar tipo" ng-change="onFormTipoChange(tipoId)"> -->
+      <!-- <ion-select [(ngModel)]="tipo" placeholder="selecionar tipo" (ionChange)="onFormTipoChange(tipo._id)"> -->
+      <!-- <ion-select [(ngModel)]="tipo._id" placeholder="selecionar tipo" (ionChange)="onFormTipoChange(tipo._id)" formControlName="tipo"> -->
+          <ion-select id="tipo" [(ngModel)]="tipo" placeholder="selecionar tipo" (ionChange)="onFormTipoChange($event)" >
+          <!-- <ion-select-option [value]="tp._id" *ngFor="let tp of tipos" (ionSelect)="onFormTipoChange(tipo._id)">{{tipo.description}}</ion-select-option> -->
+          <ion-select-option [value]="tp._id" *ngFor="let tp of tipos">{{tp.description}}</ion-select-option>
+      </ion-select>
+      </div>
+      <ion-list>      
+          <ion-item *ngFor="let img of images; index as pos" text-wrap>
+            <ion-thumbnail slot="start">
+              <ion-img [src]="img.path"></ion-img>
+            </ion-thumbnail>
+            <ion-label>
+              {{ img.name }}
+            </ion-label>
+            <ion-button slot="end" (click)="deleteImage(img, pos)">
+              <ion-icon slot="icon-only" name="trash"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ion-list>
+      <button id="submit" ion-button type="submit" block>
+          <ion-icon slot="icon-only" name="cloud-upload"></ion-icon>
+      </button>
+      </div>
+    </form>  
+  </ion-content>
+   
+  <ion-footer *ngIf="images.length < 4">
+      <ion-toolbar color="primary">
+        <ion-button fill="clear" expand="full" color="light" (click)="selectImage()">
+          <ion-icon slot="start" name="camera"></ion-icon>
+          Selecionar</ion-button>
+      </ion-toolbar>
+    </ion-footer>

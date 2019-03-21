@@ -14,7 +14,7 @@ export class WsPontosService implements OnInit {
   public urlBase: string = '';
 
   constructor(public http: HttpClient) {
-    this.urlBase = 'http://192.168.0.111:3000';
+    this.urlBase = 'http://192.168.0.8:3000';
   }
 
   ngOnInit() {}
@@ -31,7 +31,7 @@ export class WsPontosService implements OnInit {
     return this.http.get<Ponto[]>(this.urlBase+`/coordinate/`, { headers: httpHeaders});
   }
 
-  public getPonto(id: string) {
+  public getPonto(id: string): Observable<Ponto>{
     //let httpParams = new HttpParams();
     //let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
     //httpParams.append("id",id); 
@@ -41,14 +41,16 @@ export class WsPontosService implements OnInit {
     //this.pontos.find(ponto => ponto.id === id)
   }
 
-  public sendCoordinate(ponto: Ponto) {
+  public sendPonto(ponto: Ponto) {
     var data: string;
     //let httpHeaders = new HttpHeaders({'Content-Type': 'application/json' });
-    console.log('ponto: '+JSON.stringify(ponto));
+    //console.log('ponto: '+JSON.stringify(ponto));
     data = JSON.stringify(ponto);
-    return this.http.post<Ponto>(this.urlBase+`/coordinate/add`, ponto, {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return this.http.post<Ponto>(this.urlBase+`/coordinate/add`, ponto
+    // , {
+    //   headers: { 'Content-Type': 'application/json' }
+    // }
+    );
   }
 
   public login(login: string, password: string) {
@@ -80,4 +82,13 @@ export class WsPontosService implements OnInit {
     return this.http.post<User>(this.urlBase+`/user/add`, { user });
     //this.pontos.find(ponto => ponto.id === id)
   }
+
+  public debug(msg: string) {    
+    let httpParams = new HttpParams();
+    let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
+    httpParams.append("msg",msg); 
+    this.http.post(this.urlBase+`/debug`,{ headers: httpHeaders, params: httpParams });
+    //this.http.get(this.urlBase+`/debug?msg=`+msg);
+  }
+
 }
