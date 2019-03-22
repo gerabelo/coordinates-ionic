@@ -8,31 +8,31 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IonicModule } from '@ionic/angular';
-import { MapaPage } from './mapa.page';
+import { CadastroPage } from './cadastro.page';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 var routes = [
     {
         path: '',
-        component: MapaPage
+        component: CadastroPage
     }
 ];
-var MapaPageModule = /** @class */ (function () {
-    function MapaPageModule() {
+var CadastroPageModule = /** @class */ (function () {
+    function CadastroPageModule() {
     }
-    MapaPageModule = __decorate([
+    CadastroPageModule = __decorate([
         NgModule({
             imports: [
                 CommonModule,
                 FormsModule,
                 IonicModule,
                 RouterModule.forChild(routes),
-                FontAwesomeModule,
+                FontAwesomeModule
             ],
-            declarations: [MapaPage]
+            declarations: [CadastroPage]
         })
-    ], MapaPageModule);
-    return MapaPageModule;
+    ], CadastroPageModule);
+    return CadastroPageModule;
 }());
-export { MapaPageModule };
-//# sourceMappingURL=mapa.module.js.map
+export { CadastroPageModule };
+//# sourceMappingURL=cadastro.module.js.map

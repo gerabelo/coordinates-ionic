@@ -51,13 +51,15 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Location } from '@angular/common';
 import { AuthGuardService } from '../auth-guard.service';
 var PontoPage = /** @class */ (function () {
-    function PontoPage(wspontos, navCtrl, activatedRoute, geolocation, _location, authGuard) {
+    function PontoPage(wspontos, navCtrl, activatedRoute, geolocation, _location, global) {
         this.wspontos = wspontos;
         this.navCtrl = navCtrl;
         this.activatedRoute = activatedRoute;
         this.geolocation = geolocation;
         this._location = _location;
-        this.authGuard = authGuard;
+        this.global = global;
+        this.pt = { description: '', files: [] };
+        this.tipos = [];
         this.faCompass = faCompass;
         this.faInfoCircle = faInfoCircle;
         this.faChevronCircleLeft = faChevronCircleLeft;
@@ -69,9 +71,26 @@ var PontoPage = /** @class */ (function () {
     }
     PontoPage.prototype.ngOnInit = function () {
         var _this = this;
-        if (this.authGuard.loginState) {
+        if (this.global.getUser) {
+            // var p0 = new Promise(async (resolve,reject)=>{
+            this.wspontos.getTypes().subscribe(function (types) {
+                _this.tipos = types;
+            });
+            //   resolve(this.tipos);
+            //   // reject(window.location.reload());
+            // });  
+            // p0.then((tipos)=>{
+            // });
             this.wspontos.getPonto(this.activatedRoute.snapshot.paramMap.get('id')).subscribe(function (data) {
                 _this.ponto = data;
+                var tipo = _this.tipos.find(function (y) { return y._id == data.typeId; });
+                // console.log('data.typeId: '+data.typeId);
+                // console.log('tipo: '+JSON.stringify(tipo));
+                // console.log('files: '+JSON.stringify(data.files));
+                _this.pt = {
+                    description: tipo.description,
+                    files: data.files
+                };
                 var p1 = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
                     var _a;
                     return __generator(this, function (_b) {
@@ -100,7 +119,14 @@ var PontoPage = /** @class */ (function () {
                         }); });
                         p2.then(function (result) {
                             console.log("value:" + result);
-                            _this.distance = result;
+                            if (+result > 1000) {
+                                var d = new Intl.NumberFormat('pt-br', { maximumFractionDigits: 2, minimumFractionDigits: 0 }).format((+result / 1000));
+                                _this.distance = d + 'k';
+                            }
+                            else {
+                                var d = new Intl.NumberFormat('pt-br', { maximumFractionDigits: 2, minimumFractionDigits: 0 }).format(+result);
+                                _this.distance = d;
+                            }
                         });
                         return [2 /*return*/];
                     });
@@ -154,10 +180,6 @@ var PontoPage = /** @class */ (function () {
     PontoPage.prototype.goToMapa = function () {
         this.navCtrl.navigateForward('/mapa');
     };
-    PontoPage.prototype.verificar = function () { };
-    PontoPage.prototype.goToWebsite = function () { };
-    PontoPage.prototype.verNoMapa = function () { };
-    PontoPage.prototype.ligar = function () { };
     PontoPage = __decorate([
         Component({
             selector: 'app-ponto',

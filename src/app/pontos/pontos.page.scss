@@ -10,6 +10,19 @@ ion-content {
     font-family: 'Montserrat', sans-serif;
 }
 
+// img {
+//     max-width: 50%;
+//     max-height: 50%;
+// }
+img {
+    object-fit: resize;
+	height: 100%;
+	width: auto !important;
+	border: 0;
+	padding: 0;
+//	background-color: grey;
+}
+
 button {
     width: 100%;
     background-color: white;
@@ -23,9 +36,15 @@ ul > li {
 
 .points {
     float: left;
-    width: 80%;
+    width: 70%;
     color: #888;    
     font-family: 'Montserrat', sans-serif;
+}
+
+.icon {
+    position: relative;
+    float: left;
+    color: #888;    
 }
 
 .points-title {

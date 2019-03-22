@@ -18,52 +18,21 @@
     </ion-grid>
 </ion-header>
 <ion-content>
-  <ion-grid>
+  <ion-grid *ngIf="pt">
     <ion-row no-padding>
       <ion-col class="description">
-        {{ponto.description}}
+        {{pt.description}}
       </ion-col>
       <ion-col class="distance">
         {{distance}}m
       </ion-col>
     </ion-row>
-    <ion-row class="data-all" *ngIf="ponto.phone">
-      <ion-col class="data-left" size="40%"><fa-icon [icon]="faPhone" color="green"></fa-icon></ion-col>
-      <ion-col class="data">{{ponto.phone}}</ion-col>
-      <ion-col class="right">
-        <button class="data-button" (click)="ligar()">
-        ligar
-        </button>
-      </ion-col>
+    <ion-row class="files" *ngIf="pt.files">
+      <ion-list *ngFor="let image of pt.files; index as i">
+        <ion-item>
+          <img src="{{urlBase}}/img/{{image}}" />
+        </ion-item>
+      </ion-list>
     </ion-row>
-    <ion-row class="data-all" *ngIf="ponto.address">
-      <ion-col class="data-left" size="40%">
-        <fa-icon [icon]="faMapMarker" color="#019879"></fa-icon>
-      </ion-col>
-      <ion-col class="data">{{ponto.address}}</ion-col>
-      <ion-col class="right">
-          <button class="data-button" block (click)="verNoMapa()">
-              ver no mapa
-          </button>
-      </ion-col>
-    </ion-row>
-    <ion-row class="data-all" *ngIf="ponto.website">
-      <ion-col class="data-left" size="40%"><fa-icon [icon]="faDesktop" color="#019879"></fa-icon></ion-col>
-      <ion-col class="data">{{ponto.website}}</ion-col>
-      <ion-col class="right" >
-          <button class="data-button" block (click)="goToWebsite()">
-              ir para o site
-          </button>
-      </ion-col>
-    </ion-row>
-    <ion-row class="data-all">
-        <ion-col class="data-left" size="40%"><fa-icon [icon]="faRecycle" color="#019879"></fa-icon></ion-col>
-        <ion-col class="data">Materiais aceitos</ion-col>
-        <ion-col class="right">
-            <button class="data-button" block (click)="verificar()">
-                verificar
-            </button>
-        </ion-col>
-      </ion-row>    
   </ion-grid>
 </ion-content>

@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 export class Ponto {
   constructor (id, lat, lng, status, typeId, files, userId) {
-    this.id = id;
+    this._id = id;
     this.lat = lat;
     this.lng = lng;
     this.status = status;
@@ -11,7 +11,7 @@ export class Ponto {
     this.userId = userId;
   }
 
-  public id: string;
+  public _id: string;
   public lat: string;
 	public lng: string;
 	public status: string;

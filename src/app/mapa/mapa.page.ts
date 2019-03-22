@@ -204,7 +204,6 @@ export class MapaPage implements OnInit {
                 '<div id="bodyContent">'+
                   this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
                 '</div>'+
-                '<div id="tap">adicionar fotos</div>'+
                 '</div>'+
               '</div>'
               );
@@ -417,7 +416,6 @@ export class MapaPage implements OnInit {
               '<div id="bodyContent">'+
                 this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
               '</div>'+
-              '<div id="tap">fotos</div>'+
             '</div>'
           );
         });
@@ -444,8 +442,8 @@ export class MapaPage implements OnInit {
     var a = Math.sin(Δφ/2)*Math.sin(Δφ/2)+Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)*Math.sin(Δλ/2);
     var c = 2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     var d = (R * c).toFixed(1);
-    
-    return d;
+  
+    return new Intl.NumberFormat('pt-br', {minimumFractionDigits: 2}).format(+d);
   }
 
   public toRad(value: number) {

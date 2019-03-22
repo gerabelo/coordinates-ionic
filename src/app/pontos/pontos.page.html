@@ -23,14 +23,22 @@
       <ion-row>
         <ion-col>
           <ion-list>
-              <ion-item *ngFor="let pt of pontos; index as i">
-                <button class="button button-full button-light" ion-button (click)="getPonto(pt._id)">
+              <ion-item *ngFor="let pt of pts; index as i">
+                <button class="button button-full button-light" ion-button (click)="getPonto(pt.id)">
+                  <ion-col>
+                    <div class="icon">
+                      <ion-thumbnail >
+                          <img src="{{pt.icon}}">
+                        </ion-thumbnail>
+                        <!-- <ion-thumbnail>
+                            <ion-img [src]="pt.icon"></ion-img>
+                          </ion-thumbnail> -->
+                      </div>
+                  </ion-col>
                   <ion-col>
                     <div class="points">
                       <ul>        
                         <li class="points-title">{{pt.description}}</li>
-                        <li>{{pt.address}}</li>
-                        <li>{{pt.phone}}</li>
                       </ul>
                     </div>
                   </ion-col>

@@ -7,6 +7,7 @@ import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faR
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import {Location} from '@angular/common';
 import { AuthGuardService } from '../auth-guard.service';
+import { Type } from '../type';
 
 @Component({
   selector: 'app-ponto',
@@ -15,7 +16,16 @@ import { AuthGuardService } from '../auth-guard.service';
 })
 
 export class PontoPage implements OnInit {
+  public pt: {
+    description: String,
+    files: String[]
+  } = {description: '',files: ['']};
+
+  tipos: Type[] = [];
   ponto: Ponto;
+
+  public urlBase = '';
+
   faCompass = faCompass;
   faInfoCircle = faInfoCircle;
   faChevronCircleLeft = faChevronCircleLeft;
@@ -37,14 +47,34 @@ export class PontoPage implements OnInit {
     private activatedRoute: ActivatedRoute,
     private geolocation: Geolocation,
     private _location: Location,
-    public authGuard: AuthGuardService
+    public global: AuthGuardService
   ) { }
 
   ngOnInit() {
 
-    if (this.authGuard.loginState) {
+    if (this.global.getUser) {
+      this.urlBase = this.wspontos.urlBase;
+      // var p0 = new Promise(async (resolve,reject)=>{
+      this.wspontos.getTypes().subscribe(types => {
+        this.tipos = types;
+      });
+      //   resolve(this.tipos);
+      //   // reject(window.location.reload());
+      // });  
+      // p0.then((tipos)=>{
+
+      // });
+
       this.wspontos.getPonto(this.activatedRoute.snapshot.paramMap.get('id')).subscribe(data => {
         this.ponto = data;
+        let tipo: Type = this.tipos.find(y => y._id == data.typeId);
+        // console.log('data.typeId: '+data.typeId);
+        // console.log('tipo: '+JSON.stringify(tipo));
+        // console.log('files: '+JSON.stringify(data.files));
+        this.pt = {
+          description: tipo.description,
+          files: data.files
+        }
   
         var p1 = new Promise(async (resolve,reject)=>{
           this.myLatLng = await this.getLocation();
@@ -63,7 +93,15 @@ export class PontoPage implements OnInit {
             });
             p2.then((result)=>{
               console.log("value:"+result);
-              this.distance = result;
+              
+              if (+result > 1000) {
+                let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format((+result/1000));
+                this.distance = d+'k';
+              } else {
+                let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format(+result);
+                this.distance = d;
+              }
+              
             });
         });
       });
@@ -109,9 +147,4 @@ export class PontoPage implements OnInit {
   private goToMapa() {
     this.navCtrl.navigateForward('/mapa');
   }
-
-  private verificar() {}
-  private goToWebsite() {}
-  private verNoMapa() {}
-  private ligar() {}
 }

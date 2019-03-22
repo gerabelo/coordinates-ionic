@@ -6,6 +6,7 @@ import { faCompass, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { PopoverComponent } from '../popover/popover.component';
 import { Storage } from '@ionic/storage';
+import { Type } from '../type';
 
 @Component({
   selector: 'app-pontos',
@@ -15,8 +16,16 @@ import { Storage } from '@ionic/storage';
 
 export class PontosPage implements OnInit {
   public pontos: Ponto[] = [];
-  // public distances: string[] = [];
+  public tipos: Type[] = [];
+  public pts: {
+    id: string,
+    lat: number,
+    lng: number,
+    description: string,
+    icon: string
+  }[] = [];
   public distances: Array<string> = [];
+
   faCompass = faCompass;
   faInfoCircle = faInfoCircle;
 
@@ -36,30 +45,50 @@ export class PontosPage implements OnInit {
     private storage: Storage
   ) { }
 
-  ngOnInit(): void {    
+  ngOnInit(): void {
+    this.wspontos.getTypes().subscribe(types => {
+      types.forEach(type => {
+        this.tipos.push(type);
+      })
+    });
+
     this.wspontos.getPontos().subscribe(data => {
       this.pontos = data;
-      //console.log(data);
       if (this.pontos.length) {
         var p1 = new Promise((resolve,reject)=>{
           var myLatLng = this.getLocation();
           resolve(myLatLng);
         });  
         p1.then((value: {lat:number,lng:number})=>{
-          // console.log("value:"+JSON.stringify(value));
           this.pontos.forEach(ponto => {
             var p2 = new Promise((sucess,fail)=>{
               sucess(this.geodesicDistance(+ponto.lat,+ponto.lng,+value.lat,+value.lng));
             });
             p2.then((result:string)=>{
               console.log("value:"+result);
-              this.distances.push(result);
+              if (+result > 1000) {
+                let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format((+result/1000));
+                this.distances.push(d+'k');
+              } else {
+                let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format(+result);
+                this.distances.push(d);
+              }
             });
           });
         });
       } else {
         this.alertNoEntries();
       }      
+      this.pontos.forEach(ponto => {
+        let tipo = this.tipos.find(x => x._id == ponto.typeId); 
+        let lat = +ponto.lat,
+            lng = +ponto.lng,
+            id  = ponto._id,
+            description = tipo.description,
+            icon = tipo.icon
+        this.pts.push({lat: lat, lng: lng,id: id, description: description, icon: icon});
+        // console.log('ponto.id: '+ponto._id);
+      });
     });    
   }
 
@@ -82,6 +111,7 @@ export class PontosPage implements OnInit {
     // console.log("Δφ: "+Δφ);
     // console.log("Δλ: "+Δλ);
     // console.log("c: "+c);
+ 
     return d;
   }
 

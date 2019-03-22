@@ -8,8 +8,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Injectable } from '@angular/core';
+import { User } from './user';
 var AuthGuardService = /** @class */ (function () {
     function AuthGuardService() {
+        this.localUser = new User();
         this.loginState = false;
     }
     AuthGuardService.prototype.setLoginState = function (value) {
@@ -18,6 +20,12 @@ var AuthGuardService = /** @class */ (function () {
     ;
     AuthGuardService.prototype.getLoginState = function () {
         return this.loginState;
+    };
+    AuthGuardService.prototype.setUser = function (user) {
+        this.localUser = user;
+    };
+    AuthGuardService.prototype.getUser = function () {
+        return this.localUser;
     };
     AuthGuardService = __decorate([
         Injectable({

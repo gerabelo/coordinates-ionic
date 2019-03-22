@@ -7,32 +7,29 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IonicModule } from '@ionic/angular';
-import { MapaPage } from './mapa.page';
-var routes = [
-    {
-        path: '',
-        component: MapaPage
+import { RouterModule } from '@angular/router';
+import { ListPage } from './list.page';
+var ListPageModule = /** @class */ (function () {
+    function ListPageModule() {
     }
-];
-var MapaPageModule = /** @class */ (function () {
-    function MapaPageModule() {
-    }
-    MapaPageModule = __decorate([
+    ListPageModule = __decorate([
         NgModule({
             imports: [
                 CommonModule,
                 FormsModule,
                 IonicModule,
-                RouterModule.forChild(routes),
-                FontAwesomeModule,
+                RouterModule.forChild([
+                    {
+                        path: '',
+                        component: ListPage
+                    }
+                ])
             ],
-            declarations: [MapaPage]
+            declarations: [ListPage]
         })
-    ], MapaPageModule);
-    return MapaPageModule;
+    ], ListPageModule);
+    return ListPageModule;
 }());
-export { MapaPageModule };
-//# sourceMappingURL=mapa.module.js.map
+export { ListPageModule };
+//# sourceMappingURL=list.module.js.map

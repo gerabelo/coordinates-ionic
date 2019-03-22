@@ -48,58 +48,70 @@ import { NavController, PopoverController, AlertController } from '@ionic/angula
 import { faCompass, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { PopoverComponent } from '../popover/popover.component';
-import { AuthGuardService } from '../auth-guard.service';
+import { Storage } from '@ionic/storage';
 var PontosPage = /** @class */ (function () {
     // myLatLng: {
     //   lat: number,
     //   lng: number
     // }
     // myLatLng = null;
-    function PontosPage(wspontos, navCtrl, geolocation, popoverCtrl, alertCtrl, authGuard) {
+    function PontosPage(wspontos, navCtrl, geolocation, popoverCtrl, alertCtrl, storage) {
         this.wspontos = wspontos;
         this.navCtrl = navCtrl;
         this.geolocation = geolocation;
         this.popoverCtrl = popoverCtrl;
         this.alertCtrl = alertCtrl;
-        this.authGuard = authGuard;
+        this.storage = storage;
         this.pontos = [];
-        // public distances: string[] = [];
+        this.tipos = [];
+        this.pts = [];
         this.distances = [];
         this.faCompass = faCompass;
         this.faInfoCircle = faInfoCircle;
     }
     PontosPage.prototype.ngOnInit = function () {
         var _this = this;
-        if (this.authGuard.loginState) {
-            this.wspontos.getPontos().subscribe(function (data) {
-                _this.pontos = data;
-                //console.log(data);
-                if (_this.pontos.length) {
-                    var p1 = new Promise(function (resolve, reject) {
-                        var myLatLng = _this.getLocation();
-                        resolve(myLatLng);
-                    });
-                    p1.then(function (value) {
-                        // console.log("value:"+JSON.stringify(value));
-                        _this.pontos.forEach(function (ponto) {
-                            var p2 = new Promise(function (sucess, fail) {
-                                sucess(_this.geodesicDistance(+ponto.lat, +ponto.lng, +value.lat, +value.lng));
-                            });
-                            p2.then(function (result) {
-                                console.log("value:" + result);
-                                _this.distances.push(result);
-                            });
+        this.wspontos.getTypes().subscribe(function (types) {
+            types.forEach(function (type) {
+                _this.tipos.push(type);
+            });
+        });
+        this.wspontos.getPontos().subscribe(function (data) {
+            _this.pontos = data;
+            if (_this.pontos.length) {
+                var p1 = new Promise(function (resolve, reject) {
+                    var myLatLng = _this.getLocation();
+                    resolve(myLatLng);
+                });
+                p1.then(function (value) {
+                    _this.pontos.forEach(function (ponto) {
+                        var p2 = new Promise(function (sucess, fail) {
+                            sucess(_this.geodesicDistance(+ponto.lat, +ponto.lng, +value.lat, +value.lng));
+                        });
+                        p2.then(function (result) {
+                            console.log("value:" + result);
+                            if (+result > 1000) {
+                                var d = new Intl.NumberFormat('pt-br', { maximumFractionDigits: 2, minimumFractionDigits: 0 }).format((+result / 1000));
+                                _this.distances.push(d + 'k');
+                            }
+                            else {
+                                var d = new Intl.NumberFormat('pt-br', { maximumFractionDigits: 2, minimumFractionDigits: 0 }).format(+result);
+                                _this.distances.push(d);
+                            }
                         });
                     });
-                }
-                else {
-                    _this.alertNoEntries();
-                }
+                });
+            }
+            else {
+                _this.alertNoEntries();
+            }
+            _this.pontos.forEach(function (ponto) {
+                var tipo = _this.tipos.find(function (x) { return x._id == ponto.typeId; });
+                var lat = +ponto.lat, lng = +ponto.lng, id = ponto._id, description = tipo.description, icon = tipo.icon;
+                _this.pts.push({ lat: lat, lng: lng, id: id, description: description, icon: icon });
+                // console.log('ponto.id: '+ponto._id);
             });
-        }
-        else {
-            this.goToMapa();
-        }
+        });
     };
     PontosPage.prototype.getPonto = function (id) {
         this.navCtrl.navigateForward('/ponto/' + id);
@@ -206,7 +218,7 @@ var PontosPage = /** @class */ (function () {
             Geolocation,
             PopoverController,
             AlertController,
-            AuthGuardService])
+            Storage])
     ], PontosPage);
     return PontosPage;
 }());

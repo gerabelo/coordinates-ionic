@@ -8,31 +8,29 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { IonicModule } from '@ionic/angular';
-import { MapaPage } from './mapa.page';
+import { ModalSendPointPage } from './modal-send-point.page';
 var routes = [
     {
         path: '',
-        component: MapaPage
+        component: ModalSendPointPage
     }
 ];
-var MapaPageModule = /** @class */ (function () {
-    function MapaPageModule() {
+var ModalSendPointPageModule = /** @class */ (function () {
+    function ModalSendPointPageModule() {
     }
-    MapaPageModule = __decorate([
+    ModalSendPointPageModule = __decorate([
         NgModule({
             imports: [
                 CommonModule,
                 FormsModule,
                 IonicModule,
-                RouterModule.forChild(routes),
-                FontAwesomeModule,
+                RouterModule.forChild(routes)
             ],
-            declarations: [MapaPage]
+            declarations: [ModalSendPointPage]
         })
-    ], MapaPageModule);
-    return MapaPageModule;
+    ], ModalSendPointPageModule);
+    return ModalSendPointPageModule;
 }());
-export { MapaPageModule };
-//# sourceMappingURL=mapa.module.js.map
+export { ModalSendPointPageModule };
+//# sourceMappingURL=modal-send-point.module.js.map

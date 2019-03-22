@@ -19,7 +19,13 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCompass, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { PopoverComponent } from './popover/popover.component';
+import { ModalSendPointPageModule } from './modal-send-point/modal-send-point.module';
 import { AuthGuardService } from './auth-guard.service';
+import { Camera } from '@ionic-native/camera/ngx';
+import { File } from '@ionic-native/file/ngx';
+import { WebView } from '@ionic-native/ionic-webview/ngx';
+import { FilePath } from '@ionic-native/file-path/ngx';
+import { IonicStorageModule } from '@ionic/storage';
 library.add(faCompass, faInfoCircle);
 var AppModule = /** @class */ (function () {
     function AppModule() {
@@ -36,14 +42,21 @@ var AppModule = /** @class */ (function () {
                 BrowserModule,
                 IonicModule.forRoot(),
                 AppRoutingModule,
-                FontAwesomeModule
+                FontAwesomeModule,
+                ModalSendPointPageModule,
+                IonicStorageModule.forRoot()
+                // IonicStorageModule.forRoot({
+                // name: '__cico',
+                //    driverOrder: ['indexeddb', 'sqlite', 'websql']
+                // })
             ],
             providers: [
                 StatusBar,
                 SplashScreen,
                 Geolocation,
                 AuthGuardService,
-                { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
+                { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+                Camera, File, WebView, FilePath
             ],
             bootstrap: [AppComponent]
         })

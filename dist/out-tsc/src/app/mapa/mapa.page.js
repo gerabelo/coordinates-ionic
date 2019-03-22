@@ -47,14 +47,17 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { LoadingController, PopoverController } from '@ionic/angular';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop, faBars } from '@fortawesome/free-solid-svg-icons';
 import { WsPontosService } from '../ws-pontos.service';
-import { Ponto } from '../ponto';
 import { NavController } from '@ionic/angular';
 import { PopoverComponent } from '../popover/popover.component';
 import { AlertController } from '@ionic/angular';
 import { NativeGeocoder } from '@ionic-native/native-geocoder/ngx';
+import { Storage } from '@ionic/storage';
 import { AuthGuardService } from '../auth-guard.service';
+import { filter } from 'rxjs/operators';
+import { ModalController } from '@ionic/angular';
+import { ModalSendPointPage } from '../modal-send-point/modal-send-point.page';
 var MapaPage = /** @class */ (function () {
-    function MapaPage(geolocation, loadingCtrl, wspontos, navCtrl, popoverCtrl, alertCtrl, nativeGeocoder, authGuard) {
+    function MapaPage(geolocation, loadingCtrl, wspontos, navCtrl, popoverCtrl, alertCtrl, nativeGeocoder, storage, global, modal) {
         this.geolocation = geolocation;
         this.loadingCtrl = loadingCtrl;
         this.wspontos = wspontos;
@@ -62,8 +65,11 @@ var MapaPage = /** @class */ (function () {
         this.popoverCtrl = popoverCtrl;
         this.alertCtrl = alertCtrl;
         this.nativeGeocoder = nativeGeocoder;
-        this.authGuard = authGuard;
+        this.storage = storage;
+        this.global = global;
+        this.modal = modal;
         this.pontos = [];
+        this.tipos = [];
         this.faCompass = faCompass;
         this.faInfoCircle = faInfoCircle;
         this.faChevronCircleLeft = faChevronCircleLeft;
@@ -72,25 +78,46 @@ var MapaPage = /** @class */ (function () {
         this.faRecycle = faRecycle;
         this.faDesktop = faDesktop;
         this.faBars = faBars;
-        this.logado = false;
         this.mapRef = null;
         this.myLatLng = null;
         this.myMark = null;
-        // myLatLng: {
-        //   lat: number,
-        //   lng: number
-        // }
         this.options = {
             useLocale: true,
             maxResults: 5
         };
     }
+    // ionViewDidEnter() {
+    //  ionViewDidLoad() {
+    MapaPage.prototype.ngAfterViewInit = function () {
+        var _this = this;
+        this.getLocalData().then(function (value) {
+            console.log('cico: ', value);
+            if (value == null) {
+                _this.user = null;
+                _this.global.setUser(null);
+                _this.login();
+            }
+            else {
+                // this.wspontos.fast(value.id).subscribe(usuario => {
+                //   this.user = usuario;
+                // })
+                _this.user = JSON.parse(value);
+                _this.global.setUser(JSON.parse(value));
+            }
+        }).catch(function (err) {
+            _this.login();
+        });
+    };
     MapaPage.prototype.ngOnInit = function () {
         var _this = this;
-        !this.authGuard.loginState ? this.login() : null;
         this.wspontos.getPontos().subscribe(function (data) {
             _this.pontos = data;
         });
+        this.wspontos.getTypes().subscribe(function (types) {
+            _this.tipos = types;
+        });
+        //             this.tipos = types;
+        //this.loadMap_old();
         this.loadMap();
     };
     MapaPage.prototype.login = function () {
@@ -101,8 +128,7 @@ var MapaPage = /** @class */ (function () {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.alertCtrl.create({
                             backdropDismiss: false,
-                            // header: `Identifique-se`,
-                            message: "<p class='alert'><b>Identifique-se!</p>",
+                            // header: `Login`,
                             inputs: [
                                 {
                                     name: 'login',
@@ -119,25 +145,33 @@ var MapaPage = /** @class */ (function () {
                             ],
                             buttons: [
                                 {
-                                    text: 'Cancelar',
+                                    text: 'Cadastrar',
                                     role: 'cancel',
                                     cssClass: 'alert-cancel',
                                     handler: function () {
-                                        _this.authGuard.setLoginState(false);
-                                        _this.login();
+                                        _this.navCtrl.navigateForward('/cadastro');
                                     }
                                 },
                                 {
                                     text: 'Login',
-                                    cssClass: 'alert-ok',
                                     handler: function (data) {
-                                        if (data.login === 'root' && data.password === '123456') {
-                                            _this.authGuard.setLoginState(true);
-                                        }
-                                        else {
-                                            _this.authGuard.setLoginState(false);
-                                            _this.login();
-                                        }
+                                        console.log("login e pass: " + data.login + " " + data.password);
+                                        _this.wspontos.login(data.login, data.password).subscribe(function (usuario) {
+                                            console.log('usuario: ' + JSON.stringify(usuario));
+                                            if (usuario == null) {
+                                                _this.user = null;
+                                                _this.global.setUser(null);
+                                                _this.login();
+                                            }
+                                            else {
+                                                _this.setLocalData(JSON.stringify(usuario));
+                                                _this.getLocalData().then(function (value) {
+                                                    console.log('cico: ', value);
+                                                });
+                                                _this.user = usuario;
+                                                _this.global.setUser(usuario);
+                                            }
+                                        });
                                     }
                                 }
                             ]
@@ -152,65 +186,187 @@ var MapaPage = /** @class */ (function () {
     };
     MapaPage.prototype.loadMap = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var loading, _a, mapEle;
+            var loading, watchOptions, watchID;
             var _this = this;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0: return [4 /*yield*/, this.loadingCtrl.create()];
                     case 1:
-                        loading = _b.sent();
+                        loading = _a.sent();
                         loading.present();
-                        _b.label = 2;
-                    case 2:
-                        _b.trys.push([2, , 4, 5]);
-                        _a = this;
-                        return [4 /*yield*/, this.getLocation()];
-                    case 3:
-                        _a.myLatLng = _b.sent();
-                        return [3 /*break*/, 5];
-                    case 4:
-                        mapEle = document.getElementById('map');
-                        this.mapRef = new google.maps.Map(mapEle, {
-                            center: this.myLatLng,
-                            zoom: 15
-                        });
-                        return [7 /*endfinally*/];
-                    case 5:
-                        google.maps.event
-                            .addListenerOnce(this.mapRef, 'idle', function () {
-                            loading.dismiss();
-                            if (_this.pontos.length) {
-                                _this.pontos.forEach(function (ponto) {
-                                    _this.addInfoWindow(_this.mapRef, 
-                                    //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
-                                    _this.addMaker(+ponto.lat, +ponto.lng, null, ponto.type.icon, false), 
-                                    // '<div id="infoWindow-'+ponto.type.id+'">'+
-                                    '<div id="content">' +
-                                        '<div id="siteNotice">' +
-                                        '</div>' +
-                                        '<h1 id="firstHeading" class="firstHeading">' + ponto.description + '</h1>' +
-                                        '<div id="bodyContent">' +
-                                        '<p>' + ponto.address + '</br>' +
-                                        ponto.phone + '</br>' +
-                                        _this.geodesicDistance(+ponto.lat, +ponto.lng) + 'm</p>' +
-                                        '</div>' +
-                                        '</div>');
-                                });
+                        watchOptions = {
+                            timeout: 30000,
+                            maxAge: 0,
+                            enableHighAccuracy: true
+                        };
+                        watchID = navigator.geolocation.watchPosition(function (position) {
+                            ///
+                            if (position.coords != undefined) {
+                                var geoposition = position;
+                                console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
                             }
-                            _this.myMark = _this.addMaker(_this.myLatLng.lat, _this.myLatLng.lng, null, "assets/icon/mylocation.png", true);
-                            _this.pickUp(_this.myMark);
-                        });
+                            _this.setLatLng(geoposition.coords.latitude, geoposition.coords.longitude);
+                            var mapEle = document.getElementById('map');
+                            _this.mapRef = new google.maps.Map(mapEle, {
+                                center: { lat: geoposition.coords.latitude, lng: geoposition.coords.longitude },
+                                zoom: 15
+                            });
+                            google.maps.event.addListenerOnce(_this.mapRef, 'idle', function () {
+                                loading.dismiss();
+                                if (_this.pontos.length) {
+                                    _this.pontos.forEach(function (ponto) {
+                                        console.log("ponto: " + JSON.stringify(ponto));
+                                        var type = _this.tipos.find(function (x) { return x._id == ponto.typeId; });
+                                        // this.tipos.forEach(tipo => {
+                                        //   if (ponto.typeId === tipo._id) {
+                                        //     type = tipo;
+                                        //     console.log("type.icon: "+type.icon);
+                                        //   }
+                                        // });
+                                        // console.log("ponto.typeId: "+type.icon);
+                                        _this.addInfoWindow(_this.mapRef, _this.addMaker(+ponto.lat, +ponto.lng, null, type.icon, false), 
+                                        // '<div id="infoWindow-'+ponto.type.id+'">'+
+                                        '<div id="content">' +
+                                            '<div id="siteNotice">' +
+                                            '</div>' +
+                                            '<h1 id="firstHeading" class="firstHeading">' + type.description + '</h1>' +
+                                            '<div id="bodyContent">' +
+                                            _this.geodesicDistance(+ponto.lat, +ponto.lng) + 'm</p>' +
+                                            '</div>' +
+                                            '</div>' +
+                                            '</div>');
+                                    });
+                                }
+                                console.log('lat: ' + _this.lat + ' lng: ' + _this.lng);
+                                _this.myMark = _this.addMaker(_this.lat, _this.lng, null, "assets/icon/mylocation.png", true);
+                                _this.pickUp(_this.myMark);
+                            });
+                            ///
+                            navigator.geolocation.clearWatch(watchID);
+                        }, null, { enableHighAccuracy: true });
                         return [2 /*return*/];
                 }
             });
         });
     };
+    // async loadMap_new() {
+    //   //watchPosition sem clearWatch
+    //   const loading = await this.loadingCtrl.create();
+    //   loading.present();
+    //   let watchOptions = {
+    //     timeout : 30000,
+    //     maxAge: 0,
+    //     enableHighAccuracy: true
+    //   };
+    //   var watch = this.geolocation.watchPosition(watchOptions)
+    //   .pipe(filter((p) => p.coords !== undefined)) //Filter Out Errors
+    //   .subscribe((data) => {
+    //     if ((data as Geoposition).coords != undefined) {
+    //       var geoposition = (data as Geoposition);
+    //       //this.myLatLng = { lat: geoposition.coords.latitude, lng: geoposition.coords.longitude }
+    //       console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
+    //     }
+    //     this.setLatLng(geoposition.coords.latitude,geoposition.coords.longitude);
+    //     // console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
+    //     const mapEle: HTMLElement = document.getElementById('map');
+    //     this.mapRef = new google.maps.Map(mapEle, {
+    //       center: {lat: geoposition.coords.latitude, lng: geoposition.coords.longitude},
+    //       zoom: 15
+    //     });
+    //     google.maps.event
+    //     .addListenerOnce(this.mapRef, 'idle', () => {
+    //       loading.dismiss();
+    //       if (this.pontos.length) {
+    //         this.pontos.forEach(ponto => {
+    //           var type: Type;
+    //           this.tipos.forEach(tipo => {
+    //             if (ponto.typeId === tipo._id) {
+    //               type = tipo;
+    //             }
+    //           });
+    //           this.addInfoWindow(
+    //             this.mapRef,
+    //             //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
+    //             this.addMaker(+ponto.lat,+ponto.lng,null,type.icon,false),
+    //             // '<div id="infoWindow-'+ponto.type.id+'">'+
+    //             '<div id="content">'+
+    //               '<div id="siteNotice">'+
+    //               '</div>'+
+    //               '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+    //               '<div id="bodyContent">'+
+    //                 this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
+    //               '</div>'+
+    //               '<div id="tap">adicionar fotos</div>'+
+    //               '</div>'
+    //             );
+    //           });
+    //         }      
+    //         console.log('lat: '+this.lat+' lng: '+this.lng);
+    //         this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
+    //         this.pickUp(this.myMark);
+    //       });
+    //     });
+    // }
+    // async loadMap_old() {
+    //   //faz uso da versao antiga da getLocation que, por sua vez, utiliza GetCurrentPosition ao invés de WatchPosition
+    //   const loading = await this.loadingCtrl.create();
+    //   loading.present();
+    //   try {
+    //     this.myLatLng = await this.getLocation_old();
+    //   } finally {
+    //     const mapEle: HTMLElement = document.getElementById('map');
+    //     this.mapRef = new google.maps.Map(mapEle, {
+    //       center: this.myLatLng,
+    //       zoom: 15
+    //     });      
+    //   }
+    //   google.maps.event
+    //   .addListenerOnce(this.mapRef, 'idle', () => {
+    //     loading.dismiss();
+    //     if (this.pontos.length) {
+    //       this.pontos.forEach(ponto => {
+    //         var type: Type;
+    //           this.tipos.forEach(tipo => {
+    //             if (ponto.typeId === tipo._id) {
+    //               type = tipo;
+    //             }
+    //           });
+    //         this.addInfoWindow(
+    //           this.mapRef,
+    //           //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
+    //           this.addMaker(+ponto.lat,+ponto.lng,null,type.icon,false),
+    //           // '<div id="infoWindow-'+ponto.type.id+'">'+
+    //           '<div id="content">'+
+    //             '<div id="siteNotice">'+
+    //             '</div>'+
+    //             '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+    //             '<div id="bodyContent">'+
+    //               this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
+    //             '</div>'+
+    //             '<div id="tap">adicionar fotos</div>'+
+    //           '</div>'
+    //         );
+    //       });
+    //     }      
+    //     this.myMark = this.addMaker(this.myLatLng.lat, this.myLatLng.lng,null,"assets/icon/mylocation.png",true);
+    //     this.pickUp(this.myMark);
+    //   });
+    // }
     MapaPage.prototype.addInfoWindow = function (map, marker, contentString) {
         var infoWindow = new google.maps.InfoWindow({
             content: contentString
         });
         marker.addListener('click', function () {
             infoWindow.open(map, marker);
+            google.maps.event.addListenerOnce(infoWindow, 'domready', function () {
+                document.getElementById('tap').addEventListener('click', function () {
+                    alert('Clicked');
+                    //this.addPicture();
+                    console.log("touch");
+                    //this.closeInfoViewWindow(infoWindow);
+                    //this.openEventDetailModal(event);
+                });
+            });
         });
     };
     MapaPage.prototype.addMaker = function (lat, lng, lbl, ico, drag) {
@@ -230,16 +386,68 @@ var MapaPage = /** @class */ (function () {
     };
     MapaPage.prototype.getLocation = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var rta;
+            var loading, watchOptions, watch;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.geolocation.getCurrentPosition({ timeout: 30000, enableHighAccuracy: true })];
+                    case 0: return [4 /*yield*/, this.loadingCtrl.create()];
                     case 1:
-                        rta = _a.sent();
-                        return [2 /*return*/, {
-                                lat: rta.coords.latitude,
-                                lng: rta.coords.longitude
-                            }];
+                        loading = _a.sent();
+                        loading.present();
+                        watchOptions = {
+                            timeout: 30000,
+                            maxAge: 0,
+                            enableHighAccuracy: true
+                        };
+                        watch = this.geolocation.watchPosition(watchOptions)
+                            .pipe(filter(function (p) { return p.coords !== undefined; })) //Filter Out Errors
+                            .subscribe(function (data) {
+                            if (data.coords != undefined) {
+                                var geoposition = data;
+                                //this.myLatLng = { lat: geoposition.coords.latitude, lng: geoposition.coords.longitude }
+                                console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
+                            }
+                            _this.setLatLng(geoposition.coords.latitude, geoposition.coords.longitude);
+                            _this.myLatLng = { lat: geoposition.coords.latitude, lng: geoposition.coords.longitude };
+                            _this.lat = geoposition.coords.latitude;
+                            _this.lng = geoposition.coords.longitude;
+                            // console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
+                            var mapEle = document.getElementById('map');
+                            _this.mapRef = new google.maps.Map(mapEle, {
+                                center: { lat: geoposition.coords.latitude, lng: geoposition.coords.longitude },
+                                zoom: 15
+                            });
+                            google.maps.event
+                                .addListenerOnce(_this.mapRef, 'idle', function () {
+                                loading.dismiss();
+                                if (_this.pontos.length) {
+                                    _this.pontos.forEach(function (ponto) {
+                                        var type;
+                                        _this.tipos.forEach(function (tipo) {
+                                            if (ponto.typeId === tipo._id) {
+                                                type = tipo;
+                                            }
+                                        });
+                                        _this.addInfoWindow(_this.mapRef, 
+                                        //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
+                                        _this.addMaker(+ponto.lat, +ponto.lng, null, type.icon, false), 
+                                        // '<div id="infoWindow-'+ponto.type.id+'">'+
+                                        '<div id="content">' +
+                                            '<div id="siteNotice">' +
+                                            '</div>' +
+                                            '<h1 id="firstHeading" class="firstHeading">' + type.description + '</h1>' +
+                                            '<div id="bodyContent">' +
+                                            _this.geodesicDistance(+ponto.lat, +ponto.lng) + 'm</p>' +
+                                            '</div>' +
+                                            '</div>');
+                                    });
+                                }
+                                console.log('lat: ' + _this.lat + ' lng: ' + _this.lng);
+                                _this.myMark = _this.addMaker(_this.lat, _this.lng, null, "assets/icon/mylocation.png", true);
+                                _this.pickUp(_this.myMark);
+                            });
+                        });
+                        return [2 /*return*/];
                 }
             });
         });
@@ -247,13 +455,16 @@ var MapaPage = /** @class */ (function () {
     MapaPage.prototype.geodesicDistance = function (lat, lng) {
         var R = 6371000; // metres
         var φ1 = this.toRad(lat);
-        var φ2 = this.toRad(+this.myLatLng.lat);
-        var Δφ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lat) - this.toRad(lat), 2));
-        var Δλ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lng) - this.toRad(lng), 2));
+        // var φ2 = this.toRad(+this.myLatLng.lat);
+        var φ2 = this.toRad(+this.lat);
+        // var Δφ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lat)-this.toRad(lat),2));
+        // var Δλ = Math.sqrt(Math.pow(this.toRad(+this.myLatLng.lng)-this.toRad(lng),2));
+        var Δφ = Math.sqrt(Math.pow(this.toRad(+this.lat) - this.toRad(lat), 2));
+        var Δλ = Math.sqrt(Math.pow(this.toRad(+this.lng) - this.toRad(lng), 2));
         var a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
         var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         var d = (R * c).toFixed(1);
-        return d;
+        return new Intl.NumberFormat('pt-br', { minimumFractionDigits: 2 }).format(+d);
     };
     MapaPage.prototype.toRad = function (value) {
         return value * Math.PI / 180;
@@ -295,142 +506,67 @@ var MapaPage = /** @class */ (function () {
     };
     MapaPage.prototype.sendPointConfirm = function (lat, lng) {
         return __awaiter(this, void 0, void 0, function () {
-            var endereco, alertNovoPonto;
+            var SendPoint;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        //https://ionicframework.com/docs/v3/3.3.0/api/components/alert/AlertController/    
+                        //https://ionicframework.com/docs/native/native-geocoder/
                         this.nativeGeocoder.reverseGeocode(lat, lng, this.options)
                             .then(function (result) {
-                            endereco = JSON.stringify(result[0]);
                             console.log(JSON.stringify(result[0]));
-                        })
-                            .catch(function (error) { return console.log("error: " + error); });
-                        console.log('endereco: ' + endereco);
-                        return [4 /*yield*/, this.alertCtrl.create({
-                                //header: '[Novo Ponto]',
-                                message: "<p class='alert'><b>[Novo Ponto]</br></br>lat:</b> " + lat + "</br><b>lng:</b> " + lng + "</p>",
-                                inputs: [
-                                    {
-                                        name: 'description',
-                                        placeholder: 'descrição',
-                                        type: 'text'
-                                    },
-                                    {
-                                        name: 'phone',
-                                        placeholder: 'contato',
-                                        type: 'text'
-                                    },
-                                    {
-                                        name: 'address',
-                                        placeholder: 'endereço',
-                                        type: 'text'
-                                    },
-                                    {
-                                        name: 'website',
-                                        type: 'url',
-                                        placeholder: 'website'
-                                    }
-                                ],
-                                buttons: [
-                                    {
-                                        text: 'Cancelar',
-                                        role: 'cancel',
-                                        cssClass: 'alert-cancel',
-                                        handler: function () {
-                                            console.log('Cancel clicked');
-                                        }
-                                    },
-                                    {
-                                        text: 'Proximo',
-                                        cssClass: 'alert-ok',
-                                        handler: function (data) { return __awaiter(_this, void 0, void 0, function () {
-                                            var status, alertTipo;
-                                            var _this = this;
-                                            return __generator(this, function (_a) {
-                                                switch (_a.label) {
-                                                    case 0:
-                                                        console.log('Send clicked');
-                                                        status = 0;
-                                                        return [4 /*yield*/, this.alertCtrl.create({
-                                                                message: "<p class='alert'><b>Informe o Tipo</p>",
-                                                                inputs: [
-                                                                    {
-                                                                        name: 'type',
-                                                                        label: 'Blue',
-                                                                        value: { id: '001', icon: 'assets/icon/recycleBlueMarker.png' },
-                                                                        type: 'radio',
-                                                                        checked: true
-                                                                    },
-                                                                    {
-                                                                        name: 'type',
-                                                                        label: 'Green',
-                                                                        value: { id: '002', icon: 'assets/icon/recycleGreenMarker.png' },
-                                                                        type: 'radio',
-                                                                    },
-                                                                    {
-                                                                        name: 'type',
-                                                                        label: 'Red',
-                                                                        value: { id: '003', icon: 'assets/icon/recycleRedMarker.png' },
-                                                                        type: 'radio',
-                                                                    }
-                                                                ],
-                                                                buttons: [
-                                                                    {
-                                                                        text: 'Cancelar',
-                                                                        role: 'cancel',
-                                                                        cssClass: 'alert-cancel',
-                                                                        handler: function () {
-                                                                            console.log('Cancel clicked');
-                                                                        }
-                                                                    },
-                                                                    {
-                                                                        text: 'Enviar',
-                                                                        cssClass: 'alert-ok',
-                                                                        handler: function (res) {
-                                                                            console.log("res: " + JSON.stringify(res));
-                                                                            //checkbox requires res[0].icon
-                                                                            var ponto = new Ponto(null, data.description, data.phone, data.address, lat, lng, status, res, data.website);
-                                                                            _this.wspontos.sendCoordinate(ponto).subscribe(function (result) {
-                                                                                console.log('result: ' + JSON.stringify(result));
-                                                                            });
-                                                                            //window.location.reload();
-                                                                            _this.myMark.setMap(null);
-                                                                            _this.addInfoWindow(_this.mapRef, 
-                                                                            //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
-                                                                            _this.addMaker(+ponto.lat, +ponto.lng, null, res.icon, false), '<div id="content">' +
-                                                                                '<div id="siteNotice">' +
-                                                                                '</div>' +
-                                                                                '<h1 id="firstHeading" class="firstHeading">' + ponto.description + '</h1>' +
-                                                                                '<div id="bodyContent">' +
-                                                                                '<p>' + ponto.address + '</p>' +
-                                                                                '<p>' + ponto.phone + '</p>' +
-                                                                                '<p>' + _this.geodesicDistance(+ponto.lat, +ponto.lng) + ' m</p>' +
-                                                                                '</div>' +
-                                                                                '</div>');
-                                                                            _this.myMark = _this.addMaker(_this.myLatLng.lat, _this.myLatLng.lng, null, "assets/icon/mylocation.png", true);
-                                                                            _this.pickUp(_this.myMark);
-                                                                        }
-                                                                    }
-                                                                ]
-                                                            })];
-                                                    case 1:
-                                                        alertTipo = _a.sent();
-                                                        return [4 /*yield*/, alertTipo.present()];
-                                                    case 2: return [2 /*return*/, _a.sent()];
-                                                }
-                                            });
-                                        }); }
-                                    }
-                                ]
+                        }).catch(function (error) {
+                            console.log(error);
+                        });
+                        return [4 /*yield*/, this.modal.create({
+                                component: ModalSendPointPage,
+                                componentProps: { position: { lat: lat, lng: lng } }
                             })];
                     case 1:
-                        alertNovoPonto = _a.sent();
-                        return [4 /*yield*/, alertNovoPonto.present()];
+                        SendPoint = _a.sent();
+                        SendPoint.onDidDismiss().then(function (typeId) { return __awaiter(_this, void 0, void 0, function () {
+                            var type;
+                            return __generator(this, function (_a) {
+                                type = this.tipos.find(function (x) { return x._id == typeId.data; });
+                                // const alertType = await this.alertCtrl.create({  
+                                //   message: `<p><b>`+typeId['data']+`</p>`
+                                // });
+                                // return await alertType.present();
+                                this.myMark.setMap(null);
+                                this.addInfoWindow(this.mapRef, this.addMaker(+lat, +lng, type.description, type.icon, false), 
+                                // this.addMaker(+lat,+lng,null,res.icon,false),
+                                '<div id="content">' +
+                                    '<div id="siteNotice">' +
+                                    '</div>' +
+                                    '<h1 id="firstHeading" class="firstHeading">' + type.description + '</h1>' +
+                                    '<div id="bodyContent">' +
+                                    '<p>' + this.geodesicDistance(+lat, +lng) + ' m</p>' +
+                                    '</div>' +
+                                    '</div>');
+                                this.myMark = this.addMaker(this.lat, this.lng, null, "assets/icon/mylocation.png", true);
+                                this.pickUp(this.myMark);
+                                return [2 /*return*/];
+                            });
+                        }); });
+                        return [4 /*yield*/, SendPoint.present()];
                     case 2: return [2 /*return*/, _a.sent()];
                 }
             });
         });
+    };
+    MapaPage.prototype.getLocalData = function () {
+        return this.storage.get('cico');
+    };
+    MapaPage.prototype.setLocalData = function (user) {
+        return this.storage.set('cico', user);
+    };
+    MapaPage.prototype.setLatLng = function (lat, lng) {
+        this.lat = lat;
+        this.lng = lng;
+    };
+    MapaPage.prototype.getLat = function () {
+        return this.lat;
     };
     MapaPage = __decorate([
         Component({
@@ -445,7 +581,9 @@ var MapaPage = /** @class */ (function () {
             PopoverController,
             AlertController,
             NativeGeocoder,
-            AuthGuardService])
+            Storage,
+            AuthGuardService,
+            ModalController])
     ], MapaPage);
     return MapaPage;
 }());

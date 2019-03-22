@@ -1,14 +1,13 @@
 var Ponto = /** @class */ (function () {
-    function Ponto(id, description, phone, address, lat, lng, status, type, website) {
-        this.id = id;
-        this.description = description;
-        this.phone = phone;
-        this.address = address;
+    function Ponto(id, lat, lng, status, typeId, files, userId) {
+        this.files = [];
+        this._id = id;
         this.lat = lat;
         this.lng = lng;
         this.status = status;
-        this.type = type;
-        this.website = website;
+        this.typeId = typeId;
+        this.files = files;
+        this.userId = userId;
     }
     return Ponto;
 }());

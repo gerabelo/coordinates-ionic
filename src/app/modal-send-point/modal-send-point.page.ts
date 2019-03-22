@@ -39,8 +39,6 @@ export class ModalSendPointPage implements OnInit {
   //public ponto: Ponto;
   form: FormGroup;
 
-  public urlBase:string = "http://192.168.0.8:3000/";
-
   constructor(
     private camera: Camera,
     private file: File,
@@ -75,7 +73,7 @@ export class ModalSendPointPage implements OnInit {
       this.ponto.lat = position.lat;
       this.ponto.lng = position.lng;
       // this.ponto.files = [''];
-      this.ponto.typeId = '5c87da727eaf7075b3cebb5f';
+      //this.ponto.typeId = '5c87da727eaf7075b3cebb5f';
       this.wspontos.getTypes().subscribe(types => {
         types.forEach(type => {
           this.tipos.push(type);
@@ -285,7 +283,7 @@ export class ModalSendPointPage implements OnInit {
 
   uploadData(formData){
       let result = ''
-      this.http.post<String>(this.urlBase+'files/upload/',formData
+      this.http.post<String>(this.wspontos.urlBase+'files/upload/',formData
       )
       .subscribe(res => {
           if (res['status'] === 'success') {
