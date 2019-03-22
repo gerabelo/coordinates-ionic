@@ -96,8 +96,6 @@ export class MapaPage implements OnInit {
     this.wspontos.getTypes().subscribe(types => {
       this.tipos = types;
     });
-      //             this.tipos = types;
-    //this.loadMap_old();
     this.loadMap();
   }
 
@@ -186,13 +184,7 @@ export class MapaPage implements OnInit {
           this.pontos.forEach(ponto => {
             console.log("ponto: "+JSON.stringify(ponto));
             var type: Type = this.tipos.find(x => x._id == ponto.typeId);
-            // this.tipos.forEach(tipo => {
-            //   if (ponto.typeId === tipo._id) {
-            //     type = tipo;
-            //     console.log("type.icon: "+type.icon);
-            //   }
-            // });
-            // console.log("ponto.typeId: "+type.icon);
+            console.log("type: "+JSON.stringify(type));
             this.addInfoWindow(
               this.mapRef,
               this.addMaker(+ponto.lat,+ponto.lng,null,type.icon,false),
@@ -205,6 +197,7 @@ export class MapaPage implements OnInit {
                   this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
                 '</div>'+
                 '</div>'+
+                '<div id="tap">'+ponto._id+'</div>'+
               '</div>'
               );
             });
@@ -219,116 +212,6 @@ export class MapaPage implements OnInit {
     // navigator.geolocation.clearWatch(watchID);
   }
 
-  // async loadMap_new() {
-  //   //watchPosition sem clearWatch
-  //   const loading = await this.loadingCtrl.create();
-  //   loading.present();
-  //   let watchOptions = {
-  //     timeout : 30000,
-  //     maxAge: 0,
-  //     enableHighAccuracy: true
-  //   };
-
-  //   var watch = this.geolocation.watchPosition(watchOptions)
-  //   .pipe(filter((p) => p.coords !== undefined)) //Filter Out Errors
-  //   .subscribe((data) => {
-  //     if ((data as Geoposition).coords != undefined) {
-  //       var geoposition = (data as Geoposition);
-  //       //this.myLatLng = { lat: geoposition.coords.latitude, lng: geoposition.coords.longitude }
-  //       console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
-  //     }
-  //     this.setLatLng(geoposition.coords.latitude,geoposition.coords.longitude);
-
-  //     // console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
-  //     const mapEle: HTMLElement = document.getElementById('map');
-  //     this.mapRef = new google.maps.Map(mapEle, {
-  //       center: {lat: geoposition.coords.latitude, lng: geoposition.coords.longitude},
-  //       zoom: 15
-  //     });
-
-  //     google.maps.event
-  //     .addListenerOnce(this.mapRef, 'idle', () => {
-  //       loading.dismiss();
-  //       if (this.pontos.length) {
-  //         this.pontos.forEach(ponto => {
-  //           var type: Type;
-  //           this.tipos.forEach(tipo => {
-  //             if (ponto.typeId === tipo._id) {
-  //               type = tipo;
-  //             }
-  //           });
-  //           this.addInfoWindow(
-  //             this.mapRef,
-  //             //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
-  //             this.addMaker(+ponto.lat,+ponto.lng,null,type.icon,false),
-  //             // '<div id="infoWindow-'+ponto.type.id+'">'+
-  //             '<div id="content">'+
-  //               '<div id="siteNotice">'+
-  //               '</div>'+
-  //               '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
-  //               '<div id="bodyContent">'+
-  //                 this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
-  //               '</div>'+
-  //               '<div id="tap">adicionar fotos</div>'+
-  //               '</div>'
-  //             );
-  //           });
-  //         }      
-  //         console.log('lat: '+this.lat+' lng: '+this.lng);
-  //         this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
-  //         this.pickUp(this.myMark);
-  //       });
-  //     });
-  // }
-
-  // async loadMap_old() {
-  //   //faz uso da versao antiga da getLocation que, por sua vez, utiliza GetCurrentPosition ao invés de WatchPosition
-  //   const loading = await this.loadingCtrl.create();
-  //   loading.present();
-  //   try {
-  //     this.myLatLng = await this.getLocation_old();
-  //   } finally {
-  //     const mapEle: HTMLElement = document.getElementById('map');
-  //     this.mapRef = new google.maps.Map(mapEle, {
-  //       center: this.myLatLng,
-  //       zoom: 15
-  //     });      
-  //   }
-    
-  //   google.maps.event
-  //   .addListenerOnce(this.mapRef, 'idle', () => {
-  //     loading.dismiss();
-  //     if (this.pontos.length) {
-  //       this.pontos.forEach(ponto => {
-  //         var type: Type;
-  //           this.tipos.forEach(tipo => {
-  //             if (ponto.typeId === tipo._id) {
-  //               type = tipo;
-  //             }
-  //           });
-  //         this.addInfoWindow(
-  //           this.mapRef,
-  //           //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
-  //           this.addMaker(+ponto.lat,+ponto.lng,null,type.icon,false),
-  //           // '<div id="infoWindow-'+ponto.type.id+'">'+
-  //           '<div id="content">'+
-  //             '<div id="siteNotice">'+
-  //             '</div>'+
-  //             '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
-  //             '<div id="bodyContent">'+
-  //               this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
-  //             '</div>'+
-  //             '<div id="tap">adicionar fotos</div>'+
-  //           '</div>'
-  //         );
-  //       });
-  //     }      
-    
-  //     this.myMark = this.addMaker(this.myLatLng.lat, this.myLatLng.lng,null,"assets/icon/mylocation.png",true);
-  //     this.pickUp(this.myMark);
-  //   });
-  // }
-
   private addInfoWindow(map,marker,contentString: string) {
     var infoWindow = new google.maps.InfoWindow({
       content: contentString
@@ -338,11 +221,8 @@ export class MapaPage implements OnInit {
 
       google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
         document.getElementById('tap').addEventListener('click', () => {
-          alert('Clicked');
-          //this.addPicture();
-          console.log("touch");
-          //this.closeInfoViewWindow(infoWindow);
-          //this.openEventDetailModal(event);
+          // this.gotoPonto(document.getElementById('tap').innerHTML);          
+          this.navCtrl.navigateForward('/ponto/'+document.getElementById('tap').innerHTML);
         });
       });
     });
@@ -523,122 +403,8 @@ export class MapaPage implements OnInit {
       //window.location.reload();
     });
     
-    return await SendPoint.present();
+    return await SendPoint.present();  
     
-    // const alertNovoPonto = await this.alertCtrl.create({
-    //   header: '[Novo Ponto]',
-    //   // message: `<p class='alert'><b>[Novo Ponto]</br></br>lat:</b> `+lat+`</br><b>lng:</b> `+lng+`</p>`,
-    //   inputs: [
-    //     {
-    //       name: 'description',
-    //       placeholder: 'breve descrição do problema',
-    //       type: 'text'
-    //     },
-    //     {
-    //       name: 'phone',
-    //       placeholder: 'telefone para contato',
-    //       type: 'text'
-    //     },
-    //     {
-    //       name: 'address',
-    //       placeholder: ' lat:'+lat+' lng:'+lng,
-    //       type: 'text'
-    //     }
-    //   ],
-    //   buttons: [
-    //     {
-    //       text: 'Cancelar',
-    //       role: 'cancel',
-    //       cssClass: 'alert-cancel',
-    //       handler: () => {
-    //         console.log('Cancel clicked');
-    //       }
-    //     },
-    //     {
-    //       text: 'Proximo',
-    //       cssClass: 'alert-ok',
-    //       handler: async data => {
-    //         var status = 0;
-    //           this.wspontos.getTypes().subscribe(async types => {
-    //             this.tipos = types;
-    //             console.log("JSON.stringify(types): "+JSON.stringify(types));
-    //             var alertInputs: AlertInput[] = [];
-    //             this.tipos.forEach((tipo) => {
-    //               console.log("tipo.id: "+tipo._id);
-    //               alertInputs.push({
-    //                 type: "radio",
-    //                 name: "type",
-    //                 //placeholder: "",
-    //                 value: { id: tipo._id, icon: tipo.icon },
-    //                 label: tipo.description,
-    //                 checked: false,
-    //                 disabled: false,
-    //                 //id: "",
-    //                 //handler: null,
-    //                 //min: "",
-    //                 //max: ""
-    //               });
-    //             }); 
-    //             console.log("alertInputs 1: "+JSON.stringify(alertInputs));
-
-    //             const alertType = await this.alertCtrl.create({
-    //               message: `<p class='alert'><b>Informe o Tipo</p>`,
-    //               inputs: alertInputs,
-    //               buttons: [
-    //                 {
-    //                   text: 'Cancelar',
-    //                   role: 'cancel',
-    //                   cssClass: 'alert-cancel',
-    //                   handler: () => {
-    //                     console.log('Cancel clicked');
-    //                   }
-    //                 },
-    //                 {
-    //                   text: 'Enviar',
-    //                   // role: 'ok',
-    //                   // cssClass: 'alert-ok',
-    //                   handler: res => {
-    //                     if (data.description == null) {
-    //                       window.location.reload();
-    //                     }
-    //                     console.log(`res: `+JSON.stringify(res));  
-    //                     //checkbox requires res[0].icon
-    //                     //res trás id e icon da value
-    //                     var ponto = new Ponto(null,data.description,data.phone,data.address,lat,lng,status,res);
-    //                     this.wspontos.sendCoordinate(ponto).subscribe( result => {
-    //                       console.log('result: '+JSON.stringify(result));
-    //                     });
-    //                     //window.location.reload();
-    //                     this.myMark.setMap(null);
-    //                     this.addInfoWindow(
-    //                       this.mapRef,
-    //                       //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
-    //                       this.addMaker(+ponto.lat,+ponto.lng,null,res.icon,false),
-    //                       '<div id="content">'+
-    //                         '<div id="siteNotice">'+
-    //                         '</div>'+
-    //                         '<h1 id="firstHeading" class="firstHeading">'+ponto.description+'</h1>'+
-    //                         '<div id="bodyContent">'+
-    //                           '<p>'+ponto.address+'</p>'+
-    //                           '<p>'+ponto.phone+'</p>'+
-    //                           '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
-    //                         '</div>'+
-    //                       '</div>'
-    //                     );
-    //                     this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
-    //                     this.pickUp(this.myMark);
-    //                     return true;
-    //                   }
-    //                 }
-    //               ]
-    //             });
-    //             return await alertType.present();
-    //           });  
-    //         }
-    //     }
-    //   ]
-    // });
-    // return await alertNovoPonto.present();
   }
 
   getLocalData() {
@@ -656,5 +422,9 @@ export class MapaPage implements OnInit {
 
   getLat() {
     return this.lat;
+  }
+
+  gotoPonto(id: string) {
+    this.navCtrl.navigateForward('/ponto/'+id);
   }
 }

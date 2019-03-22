@@ -92,7 +92,7 @@ export class PontosPage implements OnInit {
     });    
   }
 
-  getPonto(id: string) {
+  gotoPonto(id: string) {
     this.navCtrl.navigateForward('/ponto/'+id);
   }
 
