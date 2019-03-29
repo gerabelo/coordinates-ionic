@@ -189,15 +189,25 @@ export class MapaPage implements OnInit {
               this.mapRef,
               this.addMaker(+ponto.lat,+ponto.lng,null,type.icon,false),
               // '<div id="infoWindow-'+ponto.type.id+'">'+
+              // '<div id="content">'+
+              //   '<div id="siteNotice">'+
+              //   '</div>'+
+              //   '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+              //   '<div id="bodyContent">'+
+              //     '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
+              //   '</div>'+
+              //   '</div>'+
+              //   // '<div id="tap">'+ponto._id+'</div>'+
+              // '</div>'
               '<div id="content">'+
                 '<div id="siteNotice">'+
                 '</div>'+
-                '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
-                '<div id="bodyContent">'+
-                  this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
+                '<div>'+
+                  '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+                  '<div id="bodyContent">'+
+                    '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
+                  '</div>'+
                 '</div>'+
-                '</div>'+
-                // '<div id="tap">'+ponto._id+'</div>'+
               '</div>'
               );
             });
@@ -289,14 +299,24 @@ export class MapaPage implements OnInit {
               //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
               this.addMaker(+ponto.lat,+ponto.lng,null,type.icon,false),
               // '<div id="infoWindow-'+ponto.type.id+'">'+
+            //   '<div id="content">'+
+            //     '<div id="siteNotice">'+
+            //     '</div>'+
+            //   '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+            //   '<div id="bodyContent">'+
+            //     '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
+            //   '</div>'+
+            // '</div>'
               '<div id="content">'+
                 '<div id="siteNotice">'+
                 '</div>'+
-              '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
-              '<div id="bodyContent">'+
-                this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
-              '</div>'+
-            '</div>'
+                '<div>'+
+                  '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+                  '<div id="bodyContent">'+
+                    '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
+                  '</div>'+
+                '</div>'+
+              '</div>'
           );
         });
       }      
@@ -387,16 +407,28 @@ export class MapaPage implements OnInit {
         this.myMark.setMap(null);
         this.addInfoWindow(
           this.mapRef,
-          this.addMaker(+lat,+lng,type.description,type.icon,false),
+          this.addMaker(+lat,+lng,null,type.icon,false),
           // this.addMaker(+lat,+lng,null,res.icon,false),
-          '<div id="content">'+
-            '<div id="siteNotice">'+
-            '</div>'+
-            '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
-            '<div id="bodyContent">'+
-              '<p>'+this.geodesicDistance(+lat,+lng)+' m</p>'+
-            '</div>'+
-          '</div>'
+          // '<div id="content">'+
+          //   '<div id="siteNotice">'+
+          //   '</div>'+
+          //   '<div>'+
+          //     '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+          //     '<div id="bodyContent">'+
+          //       '<p>'+this.geodesicDistance(+lat,+lng)+' m</p>'+
+          //     '</div>'+
+          //   '</div>'+
+          // '</div>'
+              '<div id="content">'+
+                '<div id="siteNotice">'+
+                '</div>'+
+                '<div>'+
+                  '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+                  '<div id="bodyContent">'+
+                    '<p>'+this.geodesicDistance(+lat,+lng)+' m</p>'+
+                  '</div>'+
+                '</div>'+
+              '</div>'
         );
         this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
         this.pickUp(this.myMark);      

@@ -144,19 +144,21 @@ export class ModalSendPointPage implements OnInit {
     await actionSheet.present();
   }
 
-  private takePicture(sourceType: PictureSourceType) {
+  private async takePicture(sourceType: PictureSourceType) {
+    const loading = await this.loadingController.create();
     this.camera.getPicture({
       quality: 50,
       sourceType: sourceType,
       saveToPhotoAlbum: false,
-      correctOrientation: true
-      //destinationType: this.camera.DestinationType.FILE_URI,
-      //encodingType: this.camera.EncodingType.JPEG,
-      //mediaType: this.camera.MediaType.PICTURE,      
+      correctOrientation: true,
+      destinationType: this.camera.DestinationType.FILE_URI,
+      encodingType: this.camera.EncodingType.JPEG,
+      mediaType: this.camera.MediaType.PICTURE,      
       //allowEdit: true,
       //targetHeight: 100,
       //targetWidth: 100
-    }).then((imagePath) => {
+    }).then(async (imagePath) => {      
+      loading.present();
     //   var currentName = imagePath.substr(imagePath.lastIndexOf('/')+1);
     //   var correctPath = imagePath.substr(0,imagePath.lastIndexOf('/')+1);
     //   this.copyFileToLocalDir(correctPath,currentName,this.createFileName());
@@ -174,7 +176,8 @@ export class ModalSendPointPage implements OnInit {
         var currentName = imagePath.substr(imagePath.lastIndexOf('/') + 1);
         var correctPath = imagePath.substr(0, imagePath.lastIndexOf('/') + 1);
         this.copyFileToLocalDir(correctPath, currentName, this.createFileName());
-      }});
+      }})
+      .finally(()=> {loading.dismiss()})
   }
 
   copyFileToLocalDir(namePath,currentName,newFileName){
