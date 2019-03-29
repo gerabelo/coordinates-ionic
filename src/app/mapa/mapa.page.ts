@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
-import { LoadingController, PopoverController } from '@ionic/angular';
+import { LoadingController, PopoverController, Platform } from '@ionic/angular';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop, faBars } from '@fortawesome/free-solid-svg-icons';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
@@ -35,6 +35,8 @@ export class MapaPage implements OnInit {
   public tipos: Type[] = []; 
   public user: User;
 
+  type;
+
   faCompass = faCompass;
   faInfoCircle = faInfoCircle;
   faChevronCircleLeft = faChevronCircleLeft;
@@ -45,7 +47,7 @@ export class MapaPage implements OnInit {
   faBars = faBars;
 
   mapRef = null;
-  myLatLng = null;
+  //myLatLng = null;
   myMark = null;
   lat: any;
   lng: any;
@@ -65,38 +67,44 @@ export class MapaPage implements OnInit {
     private nativeGeocoder: NativeGeocoder,
     private storage: Storage,
     public global: AuthGuardService,
+    private platform: Platform,
     private modal: ModalController
   ) { }
 
   // ionViewDidEnter() {
   //  ionViewDidLoad() {
   ngAfterViewInit() {
-    this.getLocalData().then((value) => {
-      console.log('cico: ', value);
-      if (value == null) {
-        this.user = null;
-        this.global.setUser(null);
-        this.login();        
-      } else {
-        // this.wspontos.fast(value.id).subscribe(usuario => {
-        //   this.user = usuario;
-        // })
-        this.user = JSON.parse(value);
-        this.global.setUser(JSON.parse(value));
-      }      
-    }).catch((err) => {
-      this.login();              
-    });
+  // ngOnInit(): void {
+      this.getLocalData().then((value) => {
+        console.log('User: ', value);
+        if (value == null) {
+          this.user = null;
+          this.global.setUser(null);
+          this.login();        
+        } else {
+          // this.wspontos.fast(value.id).subscribe(usuario => {
+          //   this.user = usuario;
+          // })
+          this.user = JSON.parse(value);
+          this.global.setUser(JSON.parse(value));
+        }      
+      }).catch((err) => {
+        this.login();              
+      });
   }
 
   ngOnInit() {
-    this.wspontos.getPontos().subscribe(data => {
-      this.pontos = data;
-    });
-    this.wspontos.getTypes().subscribe(types => {
-      this.tipos = types;
-    });
-    this.loadMap();
+    this.platform.ready().then(() => {    
+      this.wspontos.getPontos().subscribe(data => {
+        this.pontos = data;
+        console.log("pontos: "+JSON.stringify(this.pontos))
+      });
+      this.wspontos.getTypes().subscribe(types => {
+        this.tipos = types;
+        console.log("tipos: "+JSON.stringify(this.tipos))
+      });
+      this.loadMap();
+    })
   }
 
   private async login() {
@@ -183,38 +191,44 @@ export class MapaPage implements OnInit {
         if (this.pontos.length) {
           this.pontos.forEach(ponto => {
             console.log("ponto: "+JSON.stringify(ponto));
-            var type: Type = this.tipos.find(x => x._id == ponto.typeId);
-            console.log("type: "+JSON.stringify(type));
-            this.addInfoWindow(
-              this.mapRef,
-              this.addMaker(+ponto.lat,+ponto.lng,null,type.icon,false),
-              // '<div id="infoWindow-'+ponto.type.id+'">'+
-              // '<div id="content">'+
-              //   '<div id="siteNotice">'+
-              //   '</div>'+
-              //   '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
-              //   '<div id="bodyContent">'+
-              //     '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
-              //   '</div>'+
-              //   '</div>'+
-              //   // '<div id="tap">'+ponto._id+'</div>'+
-              // '</div>'
-              '<div id="content">'+
-                '<div id="siteNotice">'+
-                '</div>'+
-                '<div>'+
-                  '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
-                  '<div id="bodyContent">'+
-                    '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
+            this.type = this.tipos.find(x => x._id === ponto.typeId);
+
+            if (this.type != undefined) {  
+
+              console.log("type: "+JSON.stringify(this.type));
+              this.addInfoWindow (
+                this.mapRef,
+                this.addMaker(+ponto.lat,+ponto.lng,null,this.type.icon,false),
+                // '<div id="infoWindow-'+ponto.type.id+'">'+
+                // '<div id="content">'+
+                //   '<div id="siteNotice">'+
+                //   '</div>'+
+                //   '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+                //   '<div id="bodyContent">'+
+                //     '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
+                //   '</div>'+
+                //   '</div>'+
+                //   // '<div id="tap">'+ponto._id+'</div>'+
+                // '</div>'
+                '<div id="content">'+
+                  '<div id="siteNotice">'+
                   '</div>'+
-                '</div>'+
-              '</div>'
+                  '<div>'+
+                    '<h1 id="firstHeading" class="firstHeading">'+this.type.description+'</h1>'+
+                    '<div id="bodyContent">'+
+                      '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>'
               );
-            });
-          }      
-          console.log('lat: '+this.lat+' lng: '+this.lng);
-          this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
-          this.pickUp(this.myMark);
+            } else {
+              null
+            }
+          });
+        }      
+        console.log('lat: '+this.lat+' lng: '+this.lng);
+        this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
+        this.pickUp(this.myMark);
       });
 ///
       navigator.geolocation.clearWatch(watchID);
@@ -271,8 +285,9 @@ export class MapaPage implements OnInit {
         //this.myLatLng = { lat: geoposition.coords.latitude, lng: geoposition.coords.longitude }
         console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
       }
-      this.setLatLng(geoposition.coords.latitude,geoposition.coords.longitude);
-      this.myLatLng = {lat:geoposition.coords.latitude, lng: geoposition.coords.longitude }  
+      //this.setLatLng(geoposition.coords.latitude,geoposition.coords.longitude);
+      //this.myLatLng = {lat:geoposition.coords.latitude, lng: geoposition.coords.longitude }
+      this.global.setLocation({lat:geoposition.coords.latitude, lng: geoposition.coords.longitude });
       this.lat = geoposition.coords.latitude;
       this.lng = geoposition.coords.longitude;
       // console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);

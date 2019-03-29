@@ -7,7 +7,12 @@ import { User } from './user';
 export class AuthGuardService {
   public localUser = new User();
   public loginState:boolean = false;
-
+  public myLocation:
+  {
+    lat: number,
+    lng: number
+  }
+  
   constructor() { }
 
   setLoginState(value: boolean) {
@@ -24,5 +29,13 @@ export class AuthGuardService {
 
   getUser(): User {
     return this.localUser;
+  }
+
+  setLocation(value) {
+    this.myLocation = value;
+  }
+
+  getLocation(): any {
+    return this.myLocation;
   }
 }

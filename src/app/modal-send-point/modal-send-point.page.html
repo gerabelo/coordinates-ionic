@@ -45,17 +45,23 @@
             </ion-button>
           </ion-item>
         </ion-list>
-      <button id="submit" ion-button type="submit" block>
+      <!-- <button id="submit" ion-button type="submit" block>
           <ion-icon slot="icon-only" name="cloud-upload"></ion-icon>
-      </button>
+      </button> -->
+      <ion-button fill="clear" expand="full" color="dark" (click)="selectImage()">
+        <ion-icon slot="start" name="camera"></ion-icon>
+        Selecionar</ion-button>
       </div>
     </form>  
   </ion-content>
    
   <ion-footer *ngIf="images.length < 4">
       <ion-toolbar color="primary">
-        <ion-button fill="clear" expand="full" color="light" (click)="selectImage()">
+        <!-- <ion-button fill="clear" expand="full" color="light" (click)="selectImage()">
           <ion-icon slot="start" name="camera"></ion-icon>
-          Selecionar</ion-button>
+          Selecionar</ion-button> -->
+          <ion-button fill="clear" expand="full" color="light" (click)="startUpload(images)">
+            <ion-icon slot="start" name="cloud-upload" style="zoom:2.0;"></ion-icon>
+            Enviar</ion-button>
       </ion-toolbar>
     </ion-footer>

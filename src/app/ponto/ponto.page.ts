@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
-import { NavController } from '@ionic/angular';
+import { NavController, ToastController, Platform } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
@@ -22,6 +22,7 @@ export class PontoPage implements OnInit {
   } = {description: '',files: ['']};
 
   tipos: Type[] = [];
+  tipo;
   ponto: Ponto;
 
   public urlBase = '';
@@ -47,73 +48,97 @@ export class PontoPage implements OnInit {
     private activatedRoute: ActivatedRoute,
     private geolocation: Geolocation,
     private _location: Location,
+    private toastController: ToastController,
+    private platform: Platform,
     public global: AuthGuardService
   ) { }
 
   ngOnInit() {
-
-    if (this.global.getUser) {
-      this.urlBase = this.wspontos.urlBase;
-      // var p0 = new Promise(async (resolve,reject)=>{
-      this.wspontos.getTypes().subscribe(types => {
-        this.tipos = types;
-      });
-      //   resolve(this.tipos);
-      //   // reject(window.location.reload());
-      // });  
-      // p0.then((tipos)=>{
-
-      // });
-
-      this.wspontos.getPonto(this.activatedRoute.snapshot.paramMap.get('id')).subscribe(data => {
-        this.ponto = data;
-        let tipo: Type = this.tipos.find(y => y._id == data.typeId);
-        // console.log('data.typeId: '+data.typeId);
-        // console.log('tipo: '+JSON.stringify(tipo));
-        // console.log('files: '+JSON.stringify(data.files));
-        this.pt = {
-          description: tipo.description,
-          files: data.files
-        }
-  
-        var p1 = new Promise(async (resolve,reject)=>{
-          this.myLatLng = await this.getLocation();
-          resolve(this.myLatLng);
-          // reject(window.location.reload());
-        });  
-        p1.then(async (value: {lat:number, lng:number})=>{
-            // console.log("value: "+JSON.stringify(value));
-            // console.log("ponto: "+JSON.stringify(data));
-            // console.log("lat lng: "+data.lat+" "+data.lng);
-            // this.distance = await this.geodesicDistance(+data.lat,+data.lng);
-            // console.log("distance: "+this.distance);
-            var p2 = new Promise(async(sucess,fail)=>{
-              var distancia = this.geodesicDistance(+data.lat,+data.lng,+value.lat,+value.lng);
-              sucess(distancia);
-            });
-            p2.then((result)=>{
-              console.log("value:"+result);
-              
-              if (+result > 1000) {
-                let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format((+result/1000));
-                this.distance = d+'k';
-              } else {
-                let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format(+result);
-                this.distance = d;
-              }
-              
-            });
+    this.platform.ready().then(() => {
+      if (this.global.getUser) {
+        this.urlBase = this.wspontos.urlBase;
+        // var p0 = new Promise(async (resolve,reject)=>{
+        this.wspontos.getTypes().subscribe(types => {
+          this.tipos = types;
         });
-      });
-    } else {
-      this.goToMapa();      
-    }
+        //   resolve(this.tipos);
+        //   // reject(window.location.reload());
+        // });  
+        // p0.then((tipos)=>{
+
+        // });
+
+        this.wspontos.getPonto(this.activatedRoute.snapshot.paramMap.get('id'))
+        // .pipe(
+
+        // )
+        .subscribe(data => {
+          this.ponto = data;
+          this.tipo = this.tipos.find(y => y._id == data.typeId);
+          // console.log('data.typeId: '+data.typeId);
+          // console.log('tipo: '+JSON.stringify(tipo));
+          // console.log('files: '+JSON.stringify(data.files));
+          if (this.tipo != null && this.tipo != undefined) {
+            this.pt = {
+              description: this.tipo.description,
+              files: data.files
+            }
+          } else {
+            this.presentToast("Não foi possível carregar este Ponto.");
+            this.navCtrl.navigateForward('/pontos');
+          }
+          
+    
+          var p1 = new Promise(async (resolve,reject)=>{
+            //this.myLatLng = await this.getLocation();
+            this.myLatLng = this.global.getLocation();
+            resolve(this.myLatLng);
+            // reject(window.location.reload());
+          });  
+          p1.then(async (value: {lat:number, lng:number})=>{
+              // console.log("value: "+JSON.stringify(value));
+              // console.log("ponto: "+JSON.stringify(data));
+              // console.log("lat lng: "+data.lat+" "+data.lng);
+              // this.distance = await this.geodesicDistance(+data.lat,+data.lng);
+              // console.log("distance: "+this.distance);
+              var p2 = new Promise(async(sucess,fail)=>{
+                var distancia = this.geodesicDistance(+data.lat,+data.lng,+value.lat,+value.lng);
+                sucess(distancia);
+              });
+              p2.then((result)=>{
+                console.log("value:"+result);
+                
+                if (+result > 1000) {
+                  let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format((+result/1000));
+                  this.distance = d+'k';
+                } else {
+                  let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format(+result);
+                  this.distance = d;
+                }
+                
+              });
+          });
+        });
+      } else {
+        this.goToMapa();      
+      }
+    })
   }
-  goback() {
+
+  goBack() {
     // this.navCtrl.navigateBack;
     this._location.back();
   }
   
+  async presentToast(text) {
+    const toast = await this.toastController.create({
+      message: text,
+      position: 'bottom',
+      duration: 2000
+    });
+    toast.present();
+  }
+
   private async getLocation() {
     const rta = await this.geolocation.getCurrentPosition();
     return {

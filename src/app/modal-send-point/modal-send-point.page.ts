@@ -117,7 +117,7 @@ export class ModalSendPointPage implements OnInit {
     const toast = await this.toastController.create({
       message: text,
       position: 'bottom',
-      duration: 3000
+      duration: 2000
     });
     toast.present();
   }
