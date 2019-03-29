@@ -75,8 +75,10 @@ export class ModalSendPointPage implements OnInit {
       // this.ponto.files = [''];
       //this.ponto.typeId = '5c87da727eaf7075b3cebb5f';
       this.wspontos.getTypes().subscribe(types => {
+        console.log("tipos:");
         types.forEach(type => {
           this.tipos.push(type);
+          console.log(JSON.stringify(type));
         })
       });
       this.loadStoredImages();

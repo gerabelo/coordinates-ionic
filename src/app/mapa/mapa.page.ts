@@ -383,24 +383,26 @@ export class MapaPage implements OnInit {
       //   message: `<p><b>`+typeId['data']+`</p>`
       // });
       // return await alertType.present();
-
-      this.myMark.setMap(null);
-      this.addInfoWindow(
-        this.mapRef,
-        this.addMaker(+lat,+lng,type.description,type.icon,false),
-        // this.addMaker(+lat,+lng,null,res.icon,false),
-        '<div id="content">'+
-          '<div id="siteNotice">'+
-          '</div>'+
-          '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
-          '<div id="bodyContent">'+
-            '<p>'+this.geodesicDistance(+lat,+lng)+' m</p>'+
-          '</div>'+
-        '</div>'
-      );
-      this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
-      this.pickUp(this.myMark);      
-      //window.location.reload();
+      if (type != null && type != undefined) {
+        this.myMark.setMap(null);
+        this.addInfoWindow(
+          this.mapRef,
+          this.addMaker(+lat,+lng,type.description,type.icon,false),
+          // this.addMaker(+lat,+lng,null,res.icon,false),
+          '<div id="content">'+
+            '<div id="siteNotice">'+
+            '</div>'+
+            '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+            '<div id="bodyContent">'+
+              '<p>'+this.geodesicDistance(+lat,+lng)+' m</p>'+
+            '</div>'+
+          '</div>'
+        );
+        this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
+        this.pickUp(this.myMark);      
+        //window.location.reload();
+      }
+      
     });
     
     return await SendPoint.present();  
