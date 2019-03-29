@@ -20,19 +20,19 @@
 <ion-content padding>
     <form #form="ngForm" (ngSubmit)="startUpload(images)">
       <h3 *ngIf="images.length == 0" text-center>Nenhuma imagem</h3>
-      <div id="content" *ngIf="images.length > 0">
-      <div>
-      <ion-label>Tipo:</ion-label>
-      <!-- <ion-select ngControl="tipo" placeholder="selecionar tipo" (ngModelChange)="onFormTipoChange()"> -->
-      <!-- <ion-select ng-model="tipoId" placeholder="selecionar tipo" ng-change="onFormTipoChange(tipoId)"> -->
-      <!-- <ion-select [(ngModel)]="tipo" placeholder="selecionar tipo" (ionChange)="onFormTipoChange(tipo._id)"> -->
-      <!-- <ion-select [(ngModel)]="tipo._id" placeholder="selecionar tipo" (ionChange)="onFormTipoChange(tipo._id)" formControlName="tipo"> -->
-          <ion-select id="tipo" [(ngModel)]="tipo" placeholder="selecionar tipo" (ionChange)="onFormTipoChange($event)" >
-          <!-- <ion-select-option [value]="tp._id" *ngFor="let tp of tipos" (ionSelect)="onFormTipoChange(tipo._id)">{{tipo.description}}</ion-select-option> -->
+      <div id="content">
+      <div *ngIf="images.length > 0">
+        <ion-label>Tipo:</ion-label>
+        <!-- <ion-select ngControl="tipo" placeholder="selecionar tipo" (ngModelChange)="onFormTipoChange()"> -->
+        <!-- <ion-select ng-model="tipoId" placeholder="selecionar tipo" ng-change="onFormTipoChange(tipoId)"> -->
+        <!-- <ion-select [(ngModel)]="tipo" placeholder="selecionar tipo" (ionChange)="onFormTipoChange(tipo._id)"> -->
+        <!-- <ion-select [(ngModel)]="tipo._id" placeholder="selecionar tipo" (ionChange)="onFormTipoChange(tipo._id)" formControlName="tipo"> -->
+        <ion-select id="tipo" [(ngModel)]="tipo" placeholder="selecionar tipo" (ionChange)="onFormTipoChange($event)" >
+        <!-- <ion-select-option [value]="tp._id" *ngFor="let tp of tipos" (ionSelect)="onFormTipoChange(tipo._id)">{{tipo.description}}</ion-select-option> -->
           <ion-select-option [value]="tp._id" *ngFor="let tp of tipos">{{tp.description}}</ion-select-option>
-      </ion-select>
-      </div>
-      <ion-list>      
+        </ion-select>
+      
+        <ion-list>      
           <ion-item *ngFor="let img of images; index as pos" text-wrap>
             <ion-thumbnail slot="start">
               <ion-img [src]="img.path"></ion-img>
@@ -45,23 +45,37 @@
             </ion-button>
           </ion-item>
         </ion-list>
-      <!-- <button id="submit" ion-button type="submit" block>
-          <ion-icon slot="icon-only" name="cloud-upload"></ion-icon>
-      </button> -->
-      <ion-button fill="clear" expand="full" color="dark" (click)="selectImage()">
-        <ion-icon slot="start" name="camera"></ion-icon>
-        Selecionar</ion-button>
+        <!-- <button id="submit" ion-button type="submit" block>
+            <ion-icon slot="icon-only" name="cloud-upload"></ion-icon>
+        </button> -->
+        <ion-button fill="clear" expand="full" color="dark" (click)="selectImage()">
+          <ion-icon slot="start" name="camera"></ion-icon>Selecionar
+        </ion-button>
       </div>
+      </div>
+      
     </form>  
   </ion-content>
    
-  <ion-footer *ngIf="images.length < 4">
-      <ion-toolbar color="primary">
-        <!-- <ion-button fill="clear" expand="full" color="light" (click)="selectImage()">
-          <ion-icon slot="start" name="camera"></ion-icon>
-          Selecionar</ion-button> -->
-          <ion-button fill="clear" expand="full" color="light" (click)="startUpload(images)">
-            <ion-icon slot="start" name="cloud-upload" style="zoom:2.0;"></ion-icon>
-            Enviar</ion-button>
-      </ion-toolbar>
+    <ion-footer>
+      <div *ngIf="images.length > 0">
+        <ion-toolbar color="primary">
+          <!-- <ion-button fill="clear" expand="full" color="light" (click)="selectImage()">
+            <ion-icon slot="start" name="camera"></ion-icon>
+            Selecionar</ion-button> -->
+            <ion-button fill="clear" expand="full" color="light" (click)="startUpload(images)">
+              <ion-icon slot="start" name="cloud-upload" style="zoom:2.0;"></ion-icon>
+              Enviar</ion-button>
+        </ion-toolbar>
+      </div>
+      <div *ngIf="images.length < 1 ">
+          <ion-toolbar color="primary">
+            <!-- <ion-button fill="clear" expand="full" color="light" (click)="selectImage()">
+              <ion-icon slot="start" name="camera"></ion-icon>
+              Selecionar</ion-button> -->
+              <ion-button fill="clear" expand="full" color="light" (click)="selectImage()">
+                <ion-icon slot="start" name="camera"></ion-icon>Selecionar
+              </ion-button>
+          </ion-toolbar>
+        </div>
     </ion-footer>

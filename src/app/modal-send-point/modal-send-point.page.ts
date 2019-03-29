@@ -81,7 +81,7 @@ export class ModalSendPointPage implements OnInit {
           console.log(JSON.stringify(type));
         })
       });
-      this.loadStoredImages();
+      //this.loadStoredImages();
     });
   }
 
