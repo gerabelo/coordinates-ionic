@@ -285,7 +285,7 @@ export class ModalSendPointPage implements OnInit {
 
   uploadData(formData){
       let result = ''
-      this.http.post<String>(this.wspontos.urlBase+'files/upload/',formData
+      this.http.post<String>(this.wspontos.urlBase+'/files/upload/',formData
       )
       .subscribe(res => {
           if (res['status'] === 'success') {
@@ -294,12 +294,12 @@ export class ModalSendPointPage implements OnInit {
               // this.ponto.files.push("img/"+result);
               // this.pushFileName("img/"+result);
               // this.files.push(result);
-              this.presentToast('File upload success.');
+              this.presentToast('Arquivo enviado com sucesso.');
           } else {
-              this.presentToast('File upload failed.');
+              this.presentToast('Não foi possível enviar o arquivo.');
           }
       },err => {
-  //      this.presentToast(err.error)
+        //this.presentToast(err.error)
         this.presentToast(err.status);
       });
       return result;

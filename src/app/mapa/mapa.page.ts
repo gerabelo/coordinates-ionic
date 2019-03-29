@@ -197,7 +197,7 @@ export class MapaPage implements OnInit {
                   this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
                 '</div>'+
                 '</div>'+
-                '<div id="tap">'+ponto._id+'</div>'+
+                // '<div id="tap">'+ponto._id+'</div>'+
               '</div>'
               );
             });
