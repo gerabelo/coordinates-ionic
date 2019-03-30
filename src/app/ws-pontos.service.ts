@@ -91,4 +91,10 @@ export class WsPontosService implements OnInit {
     //this.http.get(this.urlBase+`/debug?msg=`+msg);
   }
 
+  public getUsers(): Observable<User[]> {
+    let httpParams = new HttpParams();
+    let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
+    return this.http.get<User[]>(this.urlBase+`/user/`, { headers: httpHeaders});
+  }  
+
 }

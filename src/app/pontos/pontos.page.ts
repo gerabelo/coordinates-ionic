@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
+import { User } from '../user';
 import { MenuController, NavController, PopoverController, AlertController, ToastController, Platform, LoadingController } from '@ionic/angular';
 import { faCompass, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
@@ -19,15 +20,19 @@ import { map, filter, scan, finalize } from 'rxjs/operators';
 export class PontosPage implements OnInit {
   public pontos: Ponto[] = [];
   public tipos: Type[] = [];
-  tipo;
+  public users: User[] = [];
   public pts: {
     id: string,
     lat: number,
     lng: number,
     description: string,
-    icon: string
+    icon: string,
+    username: string
   }[] = [];
   public distances: Array<string> = [];
+
+  tipo;
+  pontoUser;
 
   faCompass = faCompass;
   faInfoCircle = faInfoCircle;
@@ -72,6 +77,18 @@ export class PontosPage implements OnInit {
       //     this.tipos.push(type);
       //   })
       // });
+      this.users = this.global.getUsers()
+      if (this.users == undefined) {
+        this.wspontos.getUsers()
+        .pipe(
+          filter((p) => p != undefined)
+        )
+        .subscribe(data => {
+          this.global.setUsers(data)
+          this.users = data
+        })
+      }
+
       this.wspontos.getTypes()
       .pipe(
         filter((p) => p !== undefined),
@@ -115,16 +132,17 @@ export class PontosPage implements OnInit {
               }      
               this.pontos.forEach(ponto => {
                 this.tipo = this.tipos.find(x => x._id == ponto.typeId); 
-                if (this.tipo != undefined) {
+                this.pontoUser = this.users.find(x => x._id == ponto.userId); 
+                if (this.tipo != undefined && this.pontoUser != undefined) {
                   let lat = +ponto.lat,
                       lng = +ponto.lng,
                       id  = ponto._id,
                       description = this.tipo.description,
                       icon = this.tipo.icon
-                  this.pts.push({lat: lat, lng: lng,id: id, description: description, icon: icon});
+                  this.pts.push({lat: lat, lng: lng,id: id, description: description, icon: icon,username: this.pontoUser.username});
                 } else {
                   // this.presentToast("Alguns Pontos podem não estar sendo exibidos.");
-                  this.presentToast("Não foi possível carregar lista de Pontos.");
+                  this.presentToast("Clique nos Pontos para visualizar seu conteúdo.");
                   //this.navCtrl.navigateForward('/mapa');
                 }
               

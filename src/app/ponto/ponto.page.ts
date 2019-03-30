@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
+import { User } from '../user';
 import { NavController, ToastController, Platform, LoadingController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop } from '@fortawesome/free-solid-svg-icons';
@@ -19,11 +20,16 @@ import { map, filter, scan, finalize } from 'rxjs/operators';
 
 export class PontoPage implements OnInit {
   public pt: {
+    _id: String,
     description: String,
-    files: String[]
-  } = {description: '',files: ['']};
+    icon: String,
+    files: String[],
+    username: String
+  } = {_id: '', description: '', icon: '', files: [''], username: 'teste'};
 
   tipos: Type[] = [];
+  users: User[] = [];
+  pontoUser;
   tipo;
   ponto: Ponto;
 
@@ -64,24 +70,42 @@ export class PontoPage implements OnInit {
       if (this.global.getUser) {
         this.urlBase = this.wspontos.urlBase;
         // var p0 = new Promise(async (resolve,reject)=>{
-      
+          
+          this.users = this.global.getUsers()
+          if (this.users == undefined) {
+            this.wspontos.getUsers()
+            .pipe(
+              filter((p) => p !== undefined)
+            )
+            .subscribe(data => {
+              this.global.setUsers(data)
+              this.users = data
+            })
+          }
+        
+        
         this.wspontos.getTypes()
         .pipe(
           finalize(()=> {
             this.wspontos.getPonto(this.activatedRoute.snapshot.paramMap.get('id'))
             .pipe(
-              finalize(()=>{loading.dismiss()})
+              finalize(()=>loading.dismiss())
             )
             .subscribe(data => {
               this.ponto = data;
               this.tipo = this.tipos.find(y => y._id == data.typeId);
-              // console.log('data.typeId: '+data.typeId);
+              this.pontoUser = this.users.find(y => y._id == data.userId);
+              console.log('data.userId: '+data.userId);
+              console.log('pontoUser.username: '+this.pontoUser.username);
               // console.log('tipo: '+JSON.stringify(tipo));
-              // console.log('files: '+JSON.stringify(data.files));
-              if (this.tipo != null && this.tipo != undefined) {
+            
+              if (this.tipo != undefined && this.pontoUser != undefined) {
                 this.pt = {
+                  _id: data._id,
                   description: this.tipo.description,
-                  files: data.files
+                  icon: this.tipo.icon,
+                  files: data.files,
+                  username: this.pontoUser.username
                 }
               } else {
                 this.presentToast("Não foi possível carregar este Ponto.");

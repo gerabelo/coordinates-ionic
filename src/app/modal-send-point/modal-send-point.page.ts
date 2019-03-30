@@ -335,15 +335,30 @@ export class ModalSendPointPage implements OnInit {
       this.ponto.userId = user._id;
       this.ponto.files = this.files;
       //this.ponto.typeId = this.tipo._id;
-      this.wspontos.sendPonto(this.ponto).subscribe(data => {
+      this.wspontos.sendPonto(this.ponto)
+      // .pipe(
+      //   finalize(()=>{
+      //     this.modal.dismiss(
+      //       this.ponto.typeId,
+            
+      //     )          
+      //   })
+      // )
+      .subscribe(data => {
         console.log(JSON.stringify(data));
+          this.modal.dismiss(
+            [this.ponto.typeId,
+            data.userId,
+            this.ponto._id]
+          )          
+          // this.modal.dismiss(
+          //   this.ponto.typeId
+          // )          
       }, err => {
         console.log(JSON.stringify(err));
       });
 
-    this.modal.dismiss(
-      this.ponto.typeId
-    );
+    
   }
 
   remoteFileName(filename) {    

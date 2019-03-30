@@ -16,7 +16,7 @@ import { User } from '../user';
 import { Type } from '../type';
 import { Observable } from 'rxjs';
 import { AuthGuardService } from '../auth-guard.service';
-import { map, filter, scan } from 'rxjs/operators';
+import { map, filter, scan, finalize } from 'rxjs/operators';
 import { Entrada } from '../entrada';
 import { AlertInput } from '@ionic/core';
 import { ModalController } from '@ionic/angular';
@@ -32,9 +32,11 @@ declare var google;
 
 export class MapaPage implements OnInit {
   public pontos: Ponto[] = [];
-  public tipos: Type[] = []; 
+  public tipos: Type[] = [];
+  public users: User[] = [];
   public user: User;
-
+  
+  pontoUser;
   type;
 
   faCompass = faCompass;
@@ -95,15 +97,36 @@ export class MapaPage implements OnInit {
 
   ngOnInit() {
     this.platform.ready().then(() => {    
-      this.wspontos.getPontos().subscribe(data => {
-        this.pontos = data;
-        console.log("pontos: "+JSON.stringify(this.pontos))
-      });
-      this.wspontos.getTypes().subscribe(types => {
+      this.wspontos.getTypes()
+      .pipe(
+        filter((p) => p != undefined),
+        finalize(()=>{
+          this.wspontos.getPontos()
+          .pipe(
+            finalize(()=>{
+              this.wspontos.getUsers()
+              .pipe(
+                filter((p) => p != undefined),
+                finalize(()=> this.loadMap())
+              )
+              .subscribe(data => {
+                this.global.setUsers(data)
+                this.users = data
+              })
+        
+
+            })
+          )
+          .subscribe(data => {
+            this.pontos = data;
+            console.log("pontos: "+JSON.stringify(this.pontos))
+          });
+        })
+      )
+      .subscribe(types => {
         this.tipos = types;
         console.log("tipos: "+JSON.stringify(this.tipos))
       });
-      this.loadMap();
     })
   }
 
@@ -191,9 +214,9 @@ export class MapaPage implements OnInit {
         if (this.pontos.length) {
           this.pontos.forEach(ponto => {
             console.log("ponto: "+JSON.stringify(ponto));
-            this.type = this.tipos.find(x => x._id === ponto.typeId);
-
-            if (this.type != undefined) {  
+            this.type = this.tipos.find(x => x._id === ponto.typeId)
+            this.pontoUser = this.users.find(x => x._id === ponto.userId)
+            if (this.type != undefined && this.pontoUser != undefined) {  
 
               console.log("type: "+JSON.stringify(this.type));
               this.addInfoWindow (
@@ -211,7 +234,10 @@ export class MapaPage implements OnInit {
                 //   // '<div id="tap">'+ponto._id+'</div>'+
                 // '</div>'
                 '<div id="content">'+
-                  '<div id="siteNotice">'+
+                  '<div>'+
+                  this.pontoUser.username+
+                  '</br>'+
+                  ponto._id+
                   '</div>'+
                   '<div>'+
                     '<h1 id="firstHeading" class="firstHeading">'+this.type.description+'</h1>'+
@@ -303,16 +329,16 @@ export class MapaPage implements OnInit {
         loading.dismiss();
         if (this.pontos.length) {
           this.pontos.forEach(ponto => {
-            var type: Type;
+            // var type: Type;
             this.tipos.forEach(tipo => {
               if (ponto.typeId === tipo._id) {
-                type = tipo;
+                this.type = tipo;
               }
             });
             this.addInfoWindow(
               this.mapRef,
               //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
-              this.addMaker(+ponto.lat,+ponto.lng,null,type.icon,false),
+              this.addMaker(+ponto.lat,+ponto.lng,null,this.type.icon,false),
               // '<div id="infoWindow-'+ponto.type.id+'">'+
             //   '<div id="content">'+
             //     '<div id="siteNotice">'+
@@ -323,10 +349,11 @@ export class MapaPage implements OnInit {
             //   '</div>'+
             // '</div>'
               '<div id="content">'+
-                '<div id="siteNotice">'+
+                '<div">'+
+                ponto._id+
                 '</div>'+
                 '<div>'+
-                  '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+                  '<h1 id="firstHeading" class="firstHeading">'+this.type.description+'</h1>'+
                   '<div id="bodyContent">'+
                     '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
                   '</div>'+
@@ -411,18 +438,18 @@ export class MapaPage implements OnInit {
       componentProps: { position: { lat: lat, lng: lng } }
     });
   
-    SendPoint.onDidDismiss().then(async typeId => {
-      let type: Type = this.tipos.find(x => x._id == typeId.data);
-    
+    SendPoint.onDidDismiss().then(async res => {
+      this.type = this.tipos.find(x => x._id == res.data[0]);
+      this.pontoUser = this.users.find(x => x._id === res.data[1])
       // const alertType = await this.alertCtrl.create({  
       //   message: `<p><b>`+typeId['data']+`</p>`
       // });
       // return await alertType.present();
-      if (type != null && type != undefined) {
+      if (this.type != undefined && this.pontoUser != undefined) {
         this.myMark.setMap(null);
         this.addInfoWindow(
           this.mapRef,
-          this.addMaker(+lat,+lng,null,type.icon,false),
+          this.addMaker(+lat,+lng,null,this.type.icon,false),
           // this.addMaker(+lat,+lng,null,res.icon,false),
           // '<div id="content">'+
           //   '<div id="siteNotice">'+
@@ -435,10 +462,13 @@ export class MapaPage implements OnInit {
           //   '</div>'+
           // '</div>'
               '<div id="content">'+
-                '<div id="siteNotice">'+
+                '<div>'+
+                this.pontoUser.username+
+                '</br>'+
+                res.data[2]+
                 '</div>'+
                 '<div>'+
-                  '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
+                  '<h1 id="firstHeading" class="firstHeading">'+this.type.description+'</h1>'+
                   '<div id="bodyContent">'+
                     '<p>'+this.geodesicDistance(+lat,+lng)+' m</p>'+
                   '</div>'+

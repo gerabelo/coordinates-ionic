@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { User } from './user';
+import { Ponto } from './ponto';
+import { Type } from './type';
 
 @Injectable({
   providedIn: 'root'
@@ -7,12 +9,15 @@ import { User } from './user';
 export class AuthGuardService {
   public localUser = new User();
   public loginState:boolean = false;
+  public Users: User[];
+  public Pontos: Ponto[];
+  public Tipos: Type[];
   public myLocation:
   {
     lat: number,
     lng: number
   }
-  
+
   constructor() { }
 
   setLoginState(value: boolean) {
@@ -38,4 +43,28 @@ export class AuthGuardService {
   getLocation(): any {
     return this.myLocation;
   }
+
+  getPontos(): any {
+    return this.Pontos;
+  }
+
+  setPontos(value) {
+    this.Pontos = value;
+  }
+
+  getUsers(): any {
+    return this.Users;
+  }
+
+  setUsers(value) {
+    this.Users = value;
+  }
+
+  getTipos(): any {
+    return this.Tipos;
+  }
+
+  setTipos(value) {
+    this.Tipos = value;
+  }  
 }

@@ -15,12 +15,6 @@ button {
     background-color: white;
 }
 
-ul > li {
-    // float: left;
-    text-align: left;
-    list-style-type: none;
-}
-
 .points {
     float: left;
     width: 80%;
@@ -59,16 +53,6 @@ ul > li {
     padding-right:20px; text-align: right;
 }
 
-.description {
-    background-color: #DDD;
-    height: 50px;
-    margin: 0px !important;
-    padding-top: 15px;
-    padding-left: 30px;
-    text-align: left;
-    font-weight: bold;
-    font-size: 16pt;    
-}
 
 .data-left  {
     // padding-top: 20px;
@@ -127,6 +111,7 @@ ul > li {
 }
 
 .distance {
+    float: right;
     background-color: #DDD;
     height: 50px;
     margin: 0px !important;
@@ -135,16 +120,67 @@ ul > li {
     padding-right: 30px;
     text-align: right;
     font-weight: bold;
+    font-size: 12pt;
+    color: #019879;
+}
+
+.text {
+    background-color: #DDD;
+    width: 100%;
+    height: 80px;
+    // display: block;
+}
+
+.ponto {
+    float: left;
+    background-color: #DDD;
+    height: 50px;
+    margin: 0px !important;
+    padding-top: 5px;
+    padding-left: 30px;
+    padding-right: 30px;
+    text-align: left;
+    font-weight: bold;
     font-size: 16pt;
     color: #019879;
 }
 
+.description {
+    background-color: #DDD;
+    //height: 50px;
+    // margin: 0px !important;
+    // padding-top: 15px;
+    //padding-left: 30px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 16pt;    
+}
+
+.pontoId {
+    background-color: #DDD;
+    font-weight: bold;
+    font-size: 9pt;
+}
+
 img {
-    // object-fit: resize;
     height: 100%;
     width: 100%;
-	// width: auto !important;
-	// border: 0;
-	// padding: 0;
-//	background-color: grey;
 }
+
+ul {
+    margin: auto;
+    padding: 0px;
+}
+
+ul > li {
+    //float: left;
+    //margin: 0px !important;
+    text-align: left;
+    list-style-type: none;
+}
+
+// .icon {
+//     position: relative;
+//     float: left;
+//     color: #888;    
+// }

@@ -3,7 +3,7 @@
         <ion-row class="title">
             <ion-col class="left">
               <ion-button fill="clear" color="white" block (click)="goBack()">
-                <fa-icon [icon]="faChevronCircleLeft" size="2x" (click)="goBack()" ></fa-icon>
+                <fa-icon [icon]="faChevronCircleLeft" size="2x"></fa-icon>
               </ion-button>
             </ion-col>
             <ion-col size="auto" style="padding-top: 19px;">
@@ -20,12 +20,20 @@
 <ion-content>
   <ion-grid *ngIf="pt">
     <ion-row no-padding>
-      <ion-col class="description">
-        {{pt.description}}
-      </ion-col>
-      <ion-col class="distance">
-        {{distance}}m
-      </ion-col>
+      <div class="text">
+        <ion-col>
+          <div class="ponto">
+              <ul>
+                <li class="description">{{pt.description}}</li>
+                <li class="pontoId">{{pt.username}}</li>
+                <li class="pontoId">{{pt._id}}</li>
+              </ul>
+          </div>
+        </ion-col>
+        <ion-col>
+          <div class="distance">{{distance}}m</div>
+        </ion-col>
+      </div>
     </ion-row>
     <ion-row class="files" *ngIf="pt.files">
       <ion-list *ngFor="let image of pt.files; index as i">
