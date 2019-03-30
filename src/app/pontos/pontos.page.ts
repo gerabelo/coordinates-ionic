@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
-import { MenuController, NavController, PopoverController, AlertController, ToastController, Platform } from '@ionic/angular';
+import { MenuController, NavController, PopoverController, AlertController, ToastController, Platform, LoadingController } from '@ionic/angular';
 import { faCompass, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { PopoverComponent } from '../popover/popover.component';
 import { Storage } from '@ionic/storage';
 import { Type } from '../type';
 import { AuthGuardService } from '../auth-guard.service';
+import { map, filter, scan, finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-pontos',
@@ -47,69 +48,94 @@ export class PontosPage implements OnInit {
     private toastController: ToastController,
     public global: AuthGuardService,
     private platform: Platform,
+    private loadingCtrl: LoadingController,
     private storage: Storage
   ) {
     
   }
 
   ngOnInit(): void {
-    this.platform.ready().then(() => {
+    this.platform.ready().then(async() => {
       // this.myLatLng = this.getLocation();
+      const loading = await this.loadingCtrl.create();
+      loading.present();
+
       
       if (this.global.getLocation() == undefined) {
         this.global.setLocation(this.getLocation());
       }
 
-      this.wspontos.getTypes().subscribe(types => {
-        types.forEach(type => {
-          this.tipos.push(type);
-        })
-      });
+      this.myLatLng = this.global.getLocation();
 
-      this.wspontos.getPontos().subscribe(data => {
-        this.pontos = data;
-        if (this.pontos.length) {
-          var p1 = new Promise((resolve,reject)=>{
-            resolve(this.global.getLocation());
-          });  
-          p1.then((value: {lat:number,lng:number})=>{
-            this.pontos.forEach(ponto => {
-              var p2 = new Promise((sucess,fail)=>{
-                sucess(this.geodesicDistance(+ponto.lat,+ponto.lng,+value.lat,+value.lng));
-              });
-              p2.then((result:string)=>{
-                console.log("value:"+result);
-                if (+result > 1000) {
-                  let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format((+result/1000));
-                  this.distances.push(d+'k');
+      // this.wspontos.getTypes().subscribe(types => {
+      //   types.forEach(type => {
+      //     this.tipos.push(type);
+      //   })
+      // });
+      this.wspontos.getTypes()
+      .pipe(
+        filter((p) => p !== undefined),
+        finalize(()=>{
+            this.wspontos.getPontos()
+            .pipe(
+              finalize(()=>loading.dismiss())
+            )
+            .subscribe(data => {
+              this.pontos = data;
+              if (this.pontos.length) {
+                var p1 = new Promise((resolve,reject)=>{
+                  this.myLatLng = this.global.getLocation();
+                  if (this.myLatLng == undefined) {
+                    this.myLatLng = this.getLocation();
+                    this.global.setLocation(this.myLatLng)
+                  }
+                  resolve(this.global.getLocation());
+                });  
+                p1.then((value: {lat:number,lng:number})=>{
+
+                  this.pontos.forEach(ponto => {
+                    var p2 = new Promise((sucess,fail)=>{
+                      sucess(this.geodesicDistance(+ponto.lat,+ponto.lng,+value.lat,+value.lng));
+                      fail("-");
+                    });
+                    p2.then((result:string)=>{
+                      console.log("value:"+result);
+                      if (+result > 1000) {
+                        let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format((+result/1000));
+                        this.distances.push(d+'k');
+                      } else {
+                        let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format(+result);
+                        this.distances.push(d);
+                      }
+                    });
+                  });
+                });
+              } else {
+                this.alertNoEntries();
+              }      
+              this.pontos.forEach(ponto => {
+                this.tipo = this.tipos.find(x => x._id == ponto.typeId); 
+                if (this.tipo != undefined) {
+                  let lat = +ponto.lat,
+                      lng = +ponto.lng,
+                      id  = ponto._id,
+                      description = this.tipo.description,
+                      icon = this.tipo.icon
+                  this.pts.push({lat: lat, lng: lng,id: id, description: description, icon: icon});
                 } else {
-                  let d = new Intl.NumberFormat('pt-br', {maximumFractionDigits: 2, minimumFractionDigits: 0}).format(+result);
-                  this.distances.push(d);
+                  // this.presentToast("Alguns Pontos podem não estar sendo exibidos.");
+                  this.presentToast("Não foi possível carregar lista de Pontos.");
+                  //this.navCtrl.navigateForward('/mapa');
                 }
-              });
-            });
-          });
-        } else {
-          this.alertNoEntries();
-        }      
-        this.pontos.forEach(ponto => {
-          this.tipo = this.tipos.find(x => x._id == ponto.typeId); 
-          if (this.tipo != null && this.tipo != undefined) {
-            let lat = +ponto.lat,
-                lng = +ponto.lng,
-                id  = ponto._id,
-                description = this.tipo.description,
-                icon = this.tipo.icon
-            this.pts.push({lat: lat, lng: lng,id: id, description: description, icon: icon});
-          } else {
-            // this.presentToast("Alguns Pontos podem não estar sendo exibidos.");
-            this.presentToast("Não foi possível carregar lista de Pontos.");
-            //this.navCtrl.navigateForward('/mapa');
-          }
-        
-          // console.log('ponto.id: '+ponto._id);
-        });
-      });    
+              
+                // console.log('ponto.id: '+ponto._id);
+              })
+            })
+        })
+      ) //Filter Out Errors
+      .subscribe(types => {
+        this.tipos = types;
+      })
     })
   }
 

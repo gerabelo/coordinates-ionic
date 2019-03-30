@@ -22,12 +22,12 @@
       <h3 *ngIf="images.length == 0" text-center>Nenhuma imagem</h3>
       <div id="content">
       <div *ngIf="images.length > 0">
-        <ion-label>Tipo:</ion-label>
+        <!-- <ion-label>Tipo:</ion-label> -->
         <!-- <ion-select ngControl="tipo" placeholder="selecionar tipo" (ngModelChange)="onFormTipoChange()"> -->
         <!-- <ion-select ng-model="tipoId" placeholder="selecionar tipo" ng-change="onFormTipoChange(tipoId)"> -->
         <!-- <ion-select [(ngModel)]="tipo" placeholder="selecionar tipo" (ionChange)="onFormTipoChange(tipo._id)"> -->
         <!-- <ion-select [(ngModel)]="tipo._id" placeholder="selecionar tipo" (ionChange)="onFormTipoChange(tipo._id)" formControlName="tipo"> -->
-        <ion-select id="tipo" [(ngModel)]="tipo" placeholder="selecionar tipo" (ionChange)="onFormTipoChange($event)" >
+        <ion-select id="tipo" [(ngModel)]="tipo" placeholder="Clique para selecionar um Tipo" (ionChange)="onFormTipoChange($event)" >
         <!-- <ion-select-option [value]="tp._id" *ngFor="let tp of tipos" (ionSelect)="onFormTipoChange(tipo._id)">{{tipo.description}}</ion-select-option> -->
           <ion-select-option [value]="tp._id" *ngFor="let tp of tipos">{{tp.description}}</ion-select-option>
         </ion-select>
@@ -49,7 +49,7 @@
             <ion-icon slot="icon-only" name="cloud-upload"></ion-icon>
         </button> -->
         <ion-button fill="clear" expand="full" color="dark" (click)="selectImage()">
-          <ion-icon slot="start" name="camera"></ion-icon>Selecionar
+          <ion-icon slot="start" name="camera" style="zoom:2.0;"></ion-icon>Adicionar
         </ion-button>
       </div>
       </div>
@@ -74,7 +74,7 @@
               <ion-icon slot="start" name="camera"></ion-icon>
               Selecionar</ion-button> -->
               <ion-button fill="clear" expand="full" color="light" (click)="selectImage()">
-                <ion-icon slot="start" name="camera"></ion-icon>Selecionar
+                <ion-icon slot="start" name="camera" style="zoom:2.0;"></ion-icon>Selecionar
               </ion-button>
           </ion-toolbar>
         </div>
