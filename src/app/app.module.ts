@@ -26,6 +26,10 @@ import { WebView } from '@ionic-native/ionic-webview/ngx';
 import { FilePath } from '@ionic-native/file-path/ngx';
 import { IonicStorageModule } from '@ionic/storage';
 
+import { NativeGeocoder,
+  NativeGeocoderReverseResult,
+  NativeGeocoderForwardResult } from '@ionic-native/native-geocoder/ngx';
+
 library.add(faCompass, faInfoCircle);
 
 @NgModule({
@@ -51,7 +55,8 @@ library.add(faCompass, faInfoCircle);
     StatusBar,
     SplashScreen,
     Geolocation,
-    AuthGuardService,    
+    AuthGuardService,
+    NativeGeocoder,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     Camera, File, WebView, FilePath
   ],

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
-import { LoadingController, PopoverController, Platform } from '@ionic/angular';
+import { LoadingController, PopoverController, Platform, IonApp, ToastController } from '@ionic/angular';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop, faBars } from '@fortawesome/free-solid-svg-icons';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
@@ -8,7 +8,7 @@ import { NavController } from '@ionic/angular';
 import { PopoverComponent } from '../popover/popover.component';
 import { AlertController } from '@ionic/angular';
 import { Placeholder } from '@angular/compiler/src/i18n/i18n_ast';
-import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
+//import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
 import { stringify } from '@angular/core/src/util';
 import { logging } from 'protractor';
 import { Storage } from '@ionic/storage';
@@ -18,9 +18,10 @@ import { Observable } from 'rxjs';
 import { AuthGuardService } from '../auth-guard.service';
 import { map, filter, scan, finalize } from 'rxjs/operators';
 import { Entrada } from '../entrada';
-import { AlertInput } from '@ionic/core';
+//import { AlertInput, ViewController } from '@ionic/core';
 import { ModalController } from '@ionic/angular';
 import { ModalSendPointPage } from '../modal-send-point/modal-send-point.page';
+import { Router } from '@angular/router';
 
 declare var google;
 
@@ -54,24 +55,31 @@ export class MapaPage implements OnInit {
   lat: any;
   lng: any;
 
-  options: NativeGeocoderOptions = {
-    useLocale: true,
-    maxResults: 5
-  };
+  // options: NativeGeocoderOptions = {
+  //   useLocale: true,
+  //   maxResults: 5
+  // };
 
   constructor(
     private geolocation: Geolocation,
     private loadingCtrl: LoadingController,
     public wspontos: WsPontosService,
-    private navCtrl:NavController,
+    public navCtrl: NavController,
     public popoverCtrl: PopoverController,
     private alertCtrl: AlertController,
-    private nativeGeocoder: NativeGeocoder,
+    // private nativeGeocoder: NativeGeocoder,
     private storage: Storage,
     public global: AuthGuardService,
     private platform: Platform,
+    private router: Router,
+    // private viewCtrl: ViewController,
+    private appCtrl: IonApp,
+    private toastController: ToastController,
     private modal: ModalController
-  ) { }
+  ) {
+    // this.handleMarkerListenerClick = this.handleMarkerListenerClick.bind(this);
+    this.navCtrl = navCtrl
+  }
 
   // ionViewDidEnter() {
   //  ionViewDidLoad() {
@@ -106,7 +114,7 @@ export class MapaPage implements OnInit {
             finalize(()=>{
               this.wspontos.getUsers()
               .pipe(
-                filter((p) => p != undefined),
+                //filter((p) => p != undefined),
                 finalize(()=> this.loadMap())
               )
               .subscribe(data => {
@@ -222,27 +230,12 @@ export class MapaPage implements OnInit {
               this.addInfoWindow (
                 this.mapRef,
                 this.addMaker(+ponto.lat,+ponto.lng,null,this.type.icon,false),
-                // '<div id="infoWindow-'+ponto.type.id+'">'+
-                // '<div id="content">'+
-                //   '<div id="siteNotice">'+
-                //   '</div>'+
-                //   '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
-                //   '<div id="bodyContent">'+
-                //     '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
-                //   '</div>'+
-                //   '</div>'+
-                //   // '<div id="tap">'+ponto._id+'</div>'+
-                // '</div>'
-                '<div id="content">'+
-                  '<div>'+
-                  this.pontoUser.username+
-                  '</br>'+
-                  ponto._id+
-                  '</div>'+
+                '<div id="tap" value="'+ponto._id+'">'+
                   '<div>'+
                     '<h1 id="firstHeading" class="firstHeading">'+this.type.description+'</h1>'+
                     '<div id="bodyContent">'+
-                      '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
+                      this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</br>'+
+                      this.pontoUser.login+
                     '</div>'+
                   '</div>'+
                 '</div>'
@@ -263,6 +256,7 @@ export class MapaPage implements OnInit {
   }
 
   private addInfoWindow(map,marker,contentString: string) {
+    var _this = this;
     var infoWindow = new google.maps.InfoWindow({
       content: contentString
     });
@@ -270,10 +264,11 @@ export class MapaPage implements OnInit {
       infoWindow.open(map,marker);
 
       google.maps.event.addListenerOnce(infoWindow, 'domready', () => {
+        
         document.getElementById('tap').addEventListener('click', () => {
-          // this.gotoPonto(document.getElementById('tap').innerHTML);          
-          this.navCtrl.navigateForward('/ponto/'+document.getElementById('tap').innerHTML);
-        });
+          //_this.presentToast(document.getElementById('tap').getAttribute('value'));
+          _this.navCtrl.navigateForward('/ponto/'+document.getElementById('tap').getAttribute('value'));
+        },false);
       });
     });
   }
@@ -337,21 +332,8 @@ export class MapaPage implements OnInit {
             });
             this.addInfoWindow(
               this.mapRef,
-              //this.addMaker(+ponto.lat,+ponto.lng,ponto.description,ponto.type.icon),
               this.addMaker(+ponto.lat,+ponto.lng,null,this.type.icon,false),
-              // '<div id="infoWindow-'+ponto.type.id+'">'+
-            //   '<div id="content">'+
-            //     '<div id="siteNotice">'+
-            //     '</div>'+
-            //   '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
-            //   '<div id="bodyContent">'+
-            //     '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+'m</p>'+
-            //   '</div>'+
-            // '</div>'
-              '<div id="content">'+
-                '<div">'+
-                ponto._id+
-                '</div>'+
+              '<div id="tap" value="'+ponto._id+'">'+
                 '<div>'+
                   '<h1 id="firstHeading" class="firstHeading">'+this.type.description+'</h1>'+
                   '<div id="bodyContent">'+
@@ -426,12 +408,12 @@ export class MapaPage implements OnInit {
   //https://ionicframework.com/docs/v3/3.3.0/api/components/alert/AlertController/    
   //https://ionicframework.com/docs/native/native-geocoder/
     
-    this.nativeGeocoder.reverseGeocode(lat, lng, this.options)
-    .then((result: NativeGeocoderReverseResult[]) => {
-      console.log(JSON.stringify(result[0]));
-    }).catch(error=>{
-      console.log(error);
-    });
+    // this.nativeGeocoder.reverseGeocode(lat, lng, this.options)
+    // .then((result: NativeGeocoderReverseResult[]) => {
+    //   console.log(JSON.stringify(result[0]));
+    // }).catch(error=>{
+    //   console.log(error);
+    // });
 
     const SendPoint = await this.modal.create({
       component: ModalSendPointPage,
@@ -450,27 +432,12 @@ export class MapaPage implements OnInit {
         this.addInfoWindow(
           this.mapRef,
           this.addMaker(+lat,+lng,null,this.type.icon,false),
-          // this.addMaker(+lat,+lng,null,res.icon,false),
-          // '<div id="content">'+
-          //   '<div id="siteNotice">'+
-          //   '</div>'+
-          //   '<div>'+
-          //     '<h1 id="firstHeading" class="firstHeading">'+type.description+'</h1>'+
-          //     '<div id="bodyContent">'+
-          //       '<p>'+this.geodesicDistance(+lat,+lng)+' m</p>'+
-          //     '</div>'+
-          //   '</div>'+
-          // '</div>'
-              '<div id="content">'+
-                '<div>'+
-                this.pontoUser.username+
-                '</br>'+
-                res.data[2]+
-                '</div>'+
+              '<div id="tap" value="'+res.data[2]+'">'+
                 '<div>'+
                   '<h1 id="firstHeading" class="firstHeading">'+this.type.description+'</h1>'+
                   '<div id="bodyContent">'+
-                    '<p>'+this.geodesicDistance(+lat,+lng)+' m</p>'+
+                    this.geodesicDistance(+lat,+lng)+' m</br>'+
+                    this.pontoUser.login+
                   '</div>'+
                 '</div>'+
               '</div>'
@@ -504,6 +471,15 @@ export class MapaPage implements OnInit {
   }
 
   gotoPonto(id: string) {
-    this.navCtrl.navigateForward('/ponto/'+id);
+    this.navCtrl.navigateForward('/ponto/'+id);  
+  }
+
+  async presentToast(text) {
+    const toast = await this.toastController.create({
+      message: text,
+      position: 'bottom',
+      duration: 2000
+    });
+    toast.present();
   }
 }

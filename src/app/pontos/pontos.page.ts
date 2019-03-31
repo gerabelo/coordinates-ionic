@@ -139,7 +139,7 @@ export class PontosPage implements OnInit {
                       id  = ponto._id,
                       description = this.tipo.description,
                       icon = this.tipo.icon
-                  this.pts.push({lat: lat, lng: lng,id: id, description: description, icon: icon,username: this.pontoUser.username});
+                  this.pts.push({lat: lat, lng: lng,id: id, description: description, icon: icon,username: this.pontoUser.login});
                 } else {
                   // this.presentToast("Alguns Pontos podem não estar sendo exibidos.");
                   this.presentToast("Clique nos Pontos para visualizar seu conteúdo.");

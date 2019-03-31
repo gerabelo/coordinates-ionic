@@ -349,7 +349,7 @@ export class ModalSendPointPage implements OnInit {
           this.modal.dismiss(
             [this.ponto.typeId,
             data.userId,
-            this.ponto._id]
+            data._id]
           )          
           // this.modal.dismiss(
           //   this.ponto.typeId

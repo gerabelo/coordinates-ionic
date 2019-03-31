@@ -5,12 +5,17 @@ import { User } from '../user';
 import { NavController, ToastController, Platform, LoadingController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop } from '@fortawesome/free-solid-svg-icons';
-import { Geolocation } from '@ionic-native/geolocation/ngx';
-import {Location} from '@angular/common';
+import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
+import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
+import { Location } from '@angular/common';
 import { AuthGuardService } from '../auth-guard.service';
 import { Type } from '../type';
 import { promises } from 'fs';
 import { map, filter, scan, finalize } from 'rxjs/operators';
+import { prependListener } from 'cluster';
+import { resolve } from 'path';
+
+declare var google;
 
 @Component({
   selector: 'app-ponto',
@@ -25,11 +30,12 @@ export class PontoPage implements OnInit {
     icon: String,
     files: String[],
     username: String
-  } = {_id: '', description: '', icon: '', files: [''], username: 'teste'};
+  } = {_id: '', description: '', icon: '', files: [''], username: '...'};
 
   tipos: Type[] = [];
   users: User[] = [];
   pontoUser;
+  pontoLocation;
   tipo;
   ponto: Ponto;
 
@@ -55,6 +61,7 @@ export class PontoPage implements OnInit {
     public navCtrl: NavController,
     private activatedRoute: ActivatedRoute,
     private geolocation: Geolocation,
+    private nativeGeocoder: NativeGeocoder,
     private _location: Location,
     private toastController: ToastController,
     private platform: Platform,
@@ -64,6 +71,11 @@ export class PontoPage implements OnInit {
 
   ngOnInit() {
     this.platform.ready().then(async () => {
+
+      // this.nativeGeocoder.reverseGeocode(52.5072095, 13.1452818, {useLocale: true, maxResults: 5})
+      //         .then((result: NativeGeocoderReverseResult[]) => this.presentToast(JSON.stringify(result[0])))
+      //         .catch((error: any) => this.presentToast(error));
+
       const loading = await this.loadingCtrl.create();
       loading.present();
 
@@ -96,8 +108,19 @@ export class PontoPage implements OnInit {
               this.tipo = this.tipos.find(y => y._id == data.typeId);
               this.pontoUser = this.users.find(y => y._id == data.userId);
               console.log('data.userId: '+data.userId);
-              console.log('pontoUser.username: '+this.pontoUser.username);
-              // console.log('tipo: '+JSON.stringify(tipo));
+              console.log('pontoUser.login: '+this.pontoUser.login);
+              
+              // this.pontoLocation = this.geocodeLatLng(data.lat,data.lng);
+
+              this.nativeGeocoder.reverseGeocode(parseFloat(data.lat), parseFloat(data.lng), {useLocale: true, maxResults: 5})
+              .then((result: NativeGeocoderReverseResult[]) => {
+                //this.presentToast(result[0].thoroughfare+' '+result[0].subThoroughfare)
+                this.pontoLocation = result[0].thoroughfare+', '+result[0].subThoroughfare+', '+result[0].postalCode;
+              })
+              .catch((error: any) => this.presentToast(error));
+
+
+              //console.log("this.pontoLocation: "+this.pontoLocation);
             
               if (this.tipo != undefined && this.pontoUser != undefined) {
                 this.pt = {
@@ -105,7 +128,7 @@ export class PontoPage implements OnInit {
                   description: this.tipo.description,
                   icon: this.tipo.icon,
                   files: data.files,
-                  username: this.pontoUser.username
+                  username: this.pontoUser.login
                 }
               } else {
                 this.presentToast("Não foi possível carregar este Ponto.");
