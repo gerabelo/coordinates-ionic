@@ -240,13 +240,11 @@ export class MapaPage implements OnInit {
                   '</div>'+
                 '</div>'
               );
-            } else {
-              null
             }
           });
         }      
         console.log('lat: '+this.lat+' lng: '+this.lng);
-        this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
+        this.myMark = this.addMyMaker(this.lat, this.lng,null,"assets/icon/mylocation.png");
         this.pickUp(this.myMark);
       });
 ///
@@ -289,68 +287,19 @@ export class MapaPage implements OnInit {
     return marker;
   }
 
-  private async getLocation() {
-    const loading = await this.loadingCtrl.create();
-    loading.present();
-    let watchOptions = {
-      timeout : 30000,
-      maxAge: 0,
-      enableHighAccuracy: true
-    };
-
-    const watch = this.geolocation.watchPosition(watchOptions)
-    .pipe(filter((p) => p.coords !== undefined)) //Filter Out Errors
-    .subscribe((data) => {
-      if ((data as Geoposition).coords != undefined) {
-        var geoposition = (data as Geoposition);
-        //this.myLatLng = { lat: geoposition.coords.latitude, lng: geoposition.coords.longitude }
-        console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
-      }
-      //this.setLatLng(geoposition.coords.latitude,geoposition.coords.longitude);
-      //this.myLatLng = {lat:geoposition.coords.latitude, lng: geoposition.coords.longitude }
-      this.global.setLocation({lat:geoposition.coords.latitude, lng: geoposition.coords.longitude });
-      this.lat = geoposition.coords.latitude;
-      this.lng = geoposition.coords.longitude;
-      // console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
-      const mapEle: HTMLElement = document.getElementById('map');
-      this.mapRef = new google.maps.Map(mapEle, {
-        center: {lat: geoposition.coords.latitude, lng: geoposition.coords.longitude},
-        zoom: 15
-      });
-
-      
-      google.maps.event
-      .addListenerOnce(this.mapRef, 'idle', () => {
-        loading.dismiss();
-        if (this.pontos.length) {
-          this.pontos.forEach(ponto => {
-            // var type: Type;
-            this.tipos.forEach(tipo => {
-              if (ponto.typeId === tipo._id) {
-                this.type = tipo;
-              }
-            });
-            this.addInfoWindow(
-              this.mapRef,
-              this.addMaker(+ponto.lat,+ponto.lng,null,this.type.icon,false),
-              '<div id="tap" value="'+ponto._id+'">'+
-                '<div>'+
-                  '<h1 id="firstHeading" class="firstHeading">'+this.type.description+'</h1>'+
-                  '<div id="bodyContent">'+
-                    '<p>'+this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</p>'+
-                  '</div>'+
-                '</div>'+
-              '</div>'
-          );
-        });
-      }      
-      console.log('lat: '+this.lat+' lng: '+this.lng);
-      this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
-      this.pickUp(this.myMark);
+  private addMyMaker(lat: number, lng: number, lbl: string, ico: string) {
+    //https://developers.google.com/maps/documentation/javascript/markers
+    //https://developers.google.com/maps/documentation/javascript/distancematrix
+    //https://developers.google.com/maps/documentation/javascript/examples/marker-animations
+    //var image = 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png';
+    const marker = new google.maps.Marker({
+      position: { lat, lng },
+      map: this.mapRef,
+      label: lbl,
+      icon: ico,
+      draggable: true
     });
-
-
-    });
+    return marker;
   }
 
   private geodesicDistance(lat: number,lng: number) {
@@ -442,7 +391,7 @@ export class MapaPage implements OnInit {
                 '</div>'+
               '</div>'
         );
-        this.myMark = this.addMaker(this.lat, this.lng,null,"assets/icon/mylocation.png",true);
+        this.myMark = this.addMyMaker(this.lat, this.lng,null,"assets/icon/mylocation.png");
         this.pickUp(this.myMark);      
         //window.location.reload();
       }
