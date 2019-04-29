@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
 import { User } from '../user';
-import { NavController, ToastController, Platform, LoadingController } from '@ionic/angular';
+import { NavController, ToastController, Platform, LoadingController, AlertController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
 import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop, faUser } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
@@ -14,6 +14,7 @@ import { promises } from 'fs';
 import { map, filter, scan, finalize } from 'rxjs/operators';
 import { prependListener } from 'cluster';
 import { resolve } from 'path';
+import { Storage } from '@ionic/storage';
 
 declare var google;
 
@@ -42,7 +43,7 @@ export class PontoPage implements OnInit {
   public urlBase = '';
 
   faCompass = faCompass;
-  // faInfoCircle = faInfoCircle;
+  faInfoCircle = faInfoCircle;
   faUser = faUser;
   faChevronCircleLeft = faChevronCircleLeft;
   faMapMarker = faMapMarker;
@@ -67,7 +68,9 @@ export class PontoPage implements OnInit {
     private toastController: ToastController,
     private platform: Platform,
     private loadingCtrl: LoadingController,
-    public global: AuthGuardService
+    public global: AuthGuardService,
+    private alertCtrl: AlertController,
+    private storage: Storage
   ) { }
 
   ngOnInit() {
@@ -228,5 +231,29 @@ export class PontoPage implements OnInit {
 
   private goToMapa() {
     this.navCtrl.navigateForward('/mapa');
+  }
+  private async logout() {
+    const alertLogout = await this.alertCtrl.create({
+      backdropDismiss: false,
+      message: '<b>'+this.global.getUser().username+'</b>, deseja realmente sair?',
+      buttons: [
+        {
+          text: 'cancelar',
+          role: 'cancel',
+          cssClass: 'alert-cancel',
+          
+        },
+        {
+          text: 'sair',
+          handler: (data) => {
+                this.global.setUser(null);
+                this.storage.set('cico',null);
+                this.goToMapa();
+          }
+        }
+      ]
+    });
+
+    return await alertLogout.present(); 
   }
 }

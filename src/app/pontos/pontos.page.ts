@@ -45,11 +45,11 @@ export class PontosPage implements OnInit {
     public navCtrl: NavController,
     private geolocation: Geolocation,
     public popoverCtrl: PopoverController,
-    private alertCtrl: AlertController,
     private toastController: ToastController,
     public global: AuthGuardService,
     private platform: Platform,
     private loadingCtrl: LoadingController,
+    private alertCtrl: AlertController,
     private storage: Storage
   ) {
     
