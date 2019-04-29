@@ -244,7 +244,7 @@ export class PontosPage implements OnInit {
       message: '<b>'+this.global.getUser().username+'</b>, deseja realmente sair?',
       buttons: [
         {
-          text: 'cancel',
+          text: 'cancelar',
           role: 'cancel',
           cssClass: 'alert-cancel',
           

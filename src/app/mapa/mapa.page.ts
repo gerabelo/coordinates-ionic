@@ -444,7 +444,7 @@ export class MapaPage implements OnInit {
       message: '<b>'+this.user.username+'</b>, deseja realmente sair?',
       buttons: [
         {
-          text: 'cancel',
+          text: 'cancelar',
           role: 'cancel',
           cssClass: 'alert-cancel',
           
