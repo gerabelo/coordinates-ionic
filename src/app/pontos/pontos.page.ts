@@ -3,7 +3,7 @@ import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
 import { User } from '../user';
 import { MenuController, NavController, PopoverController, AlertController, ToastController, Platform, LoadingController } from '@ionic/angular';
-import { faCompass, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCompass, faInfoCircle, faUser } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { PopoverComponent } from '../popover/popover.component';
 import { Storage } from '@ionic/storage';
@@ -35,13 +35,9 @@ export class PontosPage implements OnInit {
   pontoUser;
 
   faCompass = faCompass;
-  faInfoCircle = faInfoCircle;
+  // faInfoCircle = faInfoCircle;
+  faUser = faUser;
 
-  // myLatLng: {
-  //   lat: number,
-  //   lng: number
-  // }
-  
   myLatLng;
 
   constructor(
@@ -240,5 +236,30 @@ export class PontosPage implements OnInit {
       ]
     });
     return await alert2.present();        
+  }
+
+  private async logout() {
+    const alertLogout = await this.alertCtrl.create({
+      backdropDismiss: false,
+      message: '<b>'+this.global.getUser().username+'</b>, deseja realmente sair?',
+      buttons: [
+        {
+          text: 'cancel',
+          role: 'cancel',
+          cssClass: 'alert-cancel',
+          
+        },
+        {
+          text: 'sair',
+          handler: (data) => {
+                this.global.setUser(null);
+                this.storage.set('cico',null);
+                this.goToMapa();
+          }
+        }
+      ]
+    });
+
+    return await alertLogout.present(); 
   }
 }

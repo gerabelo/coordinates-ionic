@@ -1,17 +1,18 @@
 <ion-header>
   <ion-grid no-padding>
       <ion-row class="title">
-          <ion-col class="left">
-            <ion-button fill="clear" color="white" block (click)="presentPopover($event)">
-              <fa-icon [icon]="faInfoCircle" size="2x"></fa-icon>
+          <ion-col class="left" size="2">
+            <!-- <ion-button fill="clear" color="white" block (click)="presentPopover($event)"> -->
+            <ion-button fill="clear" color="white" block (click)="logout()">
+              <fa-icon [icon]="faUser" size="2x"></fa-icon>
             </ion-button>
           </ion-col>
-          <ion-col size="auto" style="padding-top: 19px;">
+          <ion-col size="7" style="padding-top: 19px;">
             Cidade Coletiva
           </ion-col>
-          <ion-col class="right">
+          <ion-col class="right" size="2">
             <ion-button fill="clear" color="white" block (click)="goToList()">
-                <fa-icon [icon]="faBars" size="2x"></fa-icon>
+                <fa-icon [icon]="faListAlt" size="2x"></fa-icon>
             </ion-button>
           </ion-col>
         </ion-row>  

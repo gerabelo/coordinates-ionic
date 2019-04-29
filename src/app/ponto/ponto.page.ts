@@ -4,7 +4,7 @@ import { Ponto } from '../ponto';
 import { User } from '../user';
 import { NavController, ToastController, Platform, LoadingController } from '@ionic/angular';
 import { Router, ActivatedRoute } from '@angular/router';
-import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop } from '@fortawesome/free-solid-svg-icons';
+import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop, faUser } from '@fortawesome/free-solid-svg-icons';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
 import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
 import { Location } from '@angular/common';
@@ -42,7 +42,8 @@ export class PontoPage implements OnInit {
   public urlBase = '';
 
   faCompass = faCompass;
-  faInfoCircle = faInfoCircle;
+  // faInfoCircle = faInfoCircle;
+  faUser = faUser;
   faChevronCircleLeft = faChevronCircleLeft;
   faMapMarker = faMapMarker;
   faPhone = faPhone;

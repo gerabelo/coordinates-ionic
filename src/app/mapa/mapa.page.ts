@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation/ngx';
 import { LoadingController, PopoverController, Platform, IonApp, ToastController } from '@ionic/angular';
-import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faCompass, faInfoCircle, faChevronCircleLeft, faMapMarker, faPhone, faRecycle, faDesktop, faBars, faListAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import { WsPontosService } from '../ws-pontos.service';
 import { Ponto } from '../ponto';
 import { NavController } from '@ionic/angular';
@@ -41,13 +41,15 @@ export class MapaPage implements OnInit {
   type;
 
   faCompass = faCompass;
-  faInfoCircle = faInfoCircle;
+  // faInfoCircle = faInfoCircle;
+  faUser = faUser;
   faChevronCircleLeft = faChevronCircleLeft;
   faMapMarker = faMapMarker;
   faPhone = faPhone;
   faRecycle = faRecycle;
   faDesktop = faDesktop;
-  faBars = faBars;
+  // faBars = faBars;
+  faListAlt = faListAlt;
 
   mapRef = null;
   //myLatLng = null;
@@ -81,29 +83,33 @@ export class MapaPage implements OnInit {
     this.navCtrl = navCtrl
   }
 
-  // ionViewDidEnter() {
+  ionViewDidEnter() {
+    this.getLocalData().then((value) => {
+      console.log('User: ', value);
+      if (value == null) {
+        this.user = null;
+        this.global.setUser(null);
+        this.login();        
+      } else {
+        // this.wspontos.fast(value.id).subscribe(usuario => {
+        //   this.user = usuario;
+        // })
+        this.user = JSON.parse(value);
+        this.global.setUser(JSON.parse(value));
+      }      
+    }).catch((err) => {
+      this.login();              
+    });
+  }
   //  ionViewDidLoad() {
   ngAfterViewInit() {
   // ngOnInit(): void {
-      this.getLocalData().then((value) => {
-        console.log('User: ', value);
-        if (value == null) {
-          this.user = null;
-          this.global.setUser(null);
-          this.login();        
-        } else {
-          // this.wspontos.fast(value.id).subscribe(usuario => {
-          //   this.user = usuario;
-          // })
-          this.user = JSON.parse(value);
-          this.global.setUser(JSON.parse(value));
-        }      
-      }).catch((err) => {
-        this.login();              
-      });
+    
+      
   }
 
   ngOnInit() {
+    
     this.platform.ready().then(() => {    
       this.wspontos.getTypes()
       .pipe(
@@ -212,7 +218,7 @@ export class MapaPage implements OnInit {
       const mapEle: HTMLElement = document.getElementById('map');
       this.mapRef = new google.maps.Map(mapEle, {
         center: {lat: geoposition.coords.latitude, lng: geoposition.coords.longitude},
-        zoom: 15
+        zoom: 11
       });
 
       google.maps.event.addListenerOnce(this.mapRef, 'idle', () => {
@@ -430,5 +436,31 @@ export class MapaPage implements OnInit {
       duration: 2000
     });
     toast.present();
+  }
+
+  private async logout() {
+    const alertLogout = await this.alertCtrl.create({
+      backdropDismiss: false,
+      message: '<b>'+this.user.username+'</b>, deseja realmente sair?',
+      buttons: [
+        {
+          text: 'cancel',
+          role: 'cancel',
+          cssClass: 'alert-cancel',
+          
+        },
+        {
+          text: 'sair',
+          handler: (data) => {
+                this.user = null;
+                this.global.setUser(null);
+                this.storage.set('cico',this.user);
+                this.login();              
+          }
+        }
+      ]
+    });
+
+    return await alertLogout.present(); 
   }
 }
