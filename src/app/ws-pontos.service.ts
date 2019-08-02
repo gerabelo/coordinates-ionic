@@ -14,7 +14,8 @@ export class WsPontosService implements OnInit {
   public urlBase: string = '';
 
   constructor(public http: HttpClient) {
-    this.urlBase = 'http://142.93.160.204';
+    // this.urlBase = 'http://142.93.160.204';
+    this.urlBase = 'http://localhost:3000';
   }
 
   ngOnInit() {}

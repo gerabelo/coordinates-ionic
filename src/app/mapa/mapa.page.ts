@@ -174,7 +174,7 @@ export class MapaPage implements OnInit {
         {
           text: 'Login',
           handler: (data) => {
-            console.log("login e pass: "+data.login+" "+data.password);
+            // console.log("login e pass: "+data.login+" "+data.password);
             this.wspontos.login(data.login,data.password).subscribe( usuario => {
               console.log('usuario: '+JSON.stringify(usuario));
               if (usuario == null) {
@@ -183,8 +183,6 @@ export class MapaPage implements OnInit {
                 this.login();
               } else {
                 this.setLocalData(JSON.stringify(usuario));
-                this.getLocalData().then((value) => {
-                  console.log('cico: ', value);});
                 this.user = usuario;
                 this.global.setUser(usuario);
               }
@@ -212,6 +210,8 @@ export class MapaPage implements OnInit {
       if ((position as Geoposition).coords != undefined) {
         var geoposition = (position as Geoposition);
         console.log('Latitude: ' + geoposition.coords.latitude + ' Longitude: ' + geoposition.coords.longitude);
+      } else {
+        console.log('falha ao obter posição')
       }
       
       this.setLatLng(geoposition.coords.latitude,geoposition.coords.longitude);

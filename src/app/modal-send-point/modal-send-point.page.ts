@@ -56,14 +56,7 @@ export class ModalSendPointPage implements OnInit {
     public navParams: NavParams,
     public global: AuthGuardService,
     private modal: ModalController
-    //fb: FormBuilder,
-  ) {
-    // this.urlBase = "http://192.168.0.112:3000/"
-    // this.form = fb.group({
-    //   tipo: {} as Type
-    // });
-    
-  }
+  ) {}
 
   ngOnInit() {
     // this.addPicture();
