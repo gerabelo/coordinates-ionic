@@ -218,8 +218,8 @@ export class MapaPage implements OnInit {
         if (this.pontos.length) {
           this.pontos.forEach(ponto => {
             console.log("ponto: "+JSON.stringify(ponto));
-            this.type = this.tipos.find(x => x._id === ponto.typeId)
-            this.pontoUser = this.users.find(x => x._id === ponto.userId)
+            this.type = this.tipos.find(tps => tps._id === ponto.typeId)
+            this.pontoUser = this.users.find(usr => usr._id === ponto.userId)
             if (this.type != undefined && this.pontoUser != undefined) {  
 
               console.log("type: "+JSON.stringify(this.type));
@@ -366,8 +366,8 @@ export class MapaPage implements OnInit {
     });
   
     SendPoint.onDidDismiss().then(async res => {
-      this.type = this.tipos.find(x => x._id == res.data[0]);
-      this.pontoUser = this.users.find(x => x._id === res.data[1])
+      this.type = this.tipos.find(tps => tps._id == res.data[0]);
+      this.pontoUser = this.users.find(usr => usr._id === res.data[1])
       // const alertType = await this.alertCtrl.create({  
       //   message: `<p><b>`+typeId['data']+`</p>`
       // });
@@ -388,8 +388,10 @@ export class MapaPage implements OnInit {
               '</div>'
         );
         this.myMark = this.addMyMaker(this.lat, this.lng,null,"assets/icon/mylocation.png");
-        this.pickUp(this.myMark);      
-        //window.location.reload();
+        this.pickUp(this.myMark);
+        //window.location.reload()
+      } else {
+        this.presentToast("Erro: Usuário ou Tipo indefinidos");
       }
       
     });

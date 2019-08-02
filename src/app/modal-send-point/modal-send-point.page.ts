@@ -219,52 +219,23 @@ export class ModalSendPointPage implements OnInit {
     });
   }
 
-  startUpload(imgEntries) {
-    // if (!this.ponto.typeId) {
-    //   this.presentToast('');
-    // } else {}
-    //return new Promise(async resolve => {
-      // const loading = await this.loadingController.create({
-      //   message: 'Uploading image...',
-      // });
-      // await loading.present();
-
-        // for (let x = 0; x <= imgEntries.length ;x++) {
-        //     this.file.resolveLocalFilesystemUrl(imgEntries[x].filePath)
-        //     .then(entry => {
-        //         entry['file'](file => {
-        //           //this.ponto.files.push(this.readFile(file));
-        //           //this.readFile(file,this.ponto.files[x])
-        //           this.files.push("teste6")
-        //           this.files.push(Md5.hashStr(file.name)+file.name);
-        //           this.readFile(file)
-        //         })
-        //     })
-        //     .catch(err => {
-        //         this.presentToast('Error while reading file.');
-        //     });
-        // }
-  
+  startUpload(imgEntries) {  
         imgEntries.forEach(imgEntry => {
           this.file.resolveLocalFilesystemUrl(imgEntry.filePath)
           .then(entry => {
               entry['file'](file => {
-                //this.ponto.files.push(this.readFile(file));
                 this.readFile(file);
               });
           })
           .catch(err => {
               this.presentToast('Error while reading file.');
           });
-        });
-
-            // loading.dismiss();            
+        });      
         this.encerrarModel(imgEntries);
-        //resolve(true);})    
   }
 
   readFile(file: any) {
-    let res = ''
+    //let res = ''
     const reader = new FileReader();
     reader.onloadend = async () => {
       const formData = new FormData();
@@ -272,11 +243,11 @@ export class ModalSendPointPage implements OnInit {
         type: file.type
       });
       formData.set('file',imgBlob,file.name);
-      // formData.set('file',imgBlob,remoteFileName);
-      res = this.uploadData(formData);        
+      this.uploadData(formData);        
+      // res = this.uploadData(formData);        
     };
     reader.readAsArrayBuffer(file);
-    return res; //remover isto
+    // return res; //remover isto
   }
 
   uploadData(formData){
@@ -327,26 +298,14 @@ export class ModalSendPointPage implements OnInit {
     let user = this.global.getUser();      
       this.ponto.userId = user._id;
       this.ponto.files = this.files;
-      //this.ponto.typeId = this.tipo._id;
       this.wspontos.sendPonto(this.ponto)
-      // .pipe(
-      //   finalize(()=>{
-      //     this.modal.dismiss(
-      //       this.ponto.typeId,
-            
-      //     )          
-      //   })
-      // )
       .subscribe(data => {
         console.log(JSON.stringify(data));
           this.modal.dismiss(
             [this.ponto.typeId,
             data.userId,
             data._id]
-          )          
-          // this.modal.dismiss(
-          //   this.ponto.typeId
-          // )          
+          )                
       }, err => {
         console.log(JSON.stringify(err));
       });
