@@ -140,7 +140,7 @@ export class MapaPage implements OnInit {
       // header: `Login`,
       inputs: [
         {
-          name: 'login',
+          name: 'api_key',
           // label: 'user',
           placeholder: 'user',
           type: 'text'
@@ -165,7 +165,7 @@ export class MapaPage implements OnInit {
           text: 'Login',
           handler: (data) => {
             // console.log("login e pass: "+data.login+" "+data.password);
-            this.wspontos.login(data.login,data.password).subscribe( usuario => {
+            this.wspontos.login(data.api_key,data.password).subscribe( usuario => {
               console.log('usuario: '+JSON.stringify(usuario));
               if (usuario == null) {
                 this.user = null;
@@ -231,7 +231,7 @@ export class MapaPage implements OnInit {
                     '<h1 id="firstHeading" class="firstHeading">'+this.type.description+'</h1>'+
                     '<div id="bodyContent">'+
                       this.geodesicDistance(+ponto.lat,+ponto.lng)+' m</br>'+
-                      this.pontoUser.login+
+                      this.pontoUser.api_key+
                     '</div>'+
                   '</div>'+
                 '</div>'
