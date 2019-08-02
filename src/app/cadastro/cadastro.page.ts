@@ -35,7 +35,7 @@ export class CadastroPage implements OnInit {
   ngOnInit() {
     this.newUser.status = "1";
   }
-
+//username fullname shortname email phone api_key
   cadastro() {
     let password = String(this.newUser.password);
     this.newUser.password = String(Md5.hashStr(password));

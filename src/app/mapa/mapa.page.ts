@@ -8,7 +8,7 @@ import { NavController } from '@ionic/angular';
 import { PopoverComponent } from '../popover/popover.component';
 import { AlertController } from '@ionic/angular';
 import { Placeholder } from '@angular/compiler/src/i18n/i18n_ast';
-//import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
+import { NativeGeocoder, NativeGeocoderReverseResult, NativeGeocoderForwardResult, NativeGeocoderOptions } from '@ionic-native/native-geocoder/ngx';
 import { stringify } from '@angular/core/src/util';
 import { logging } from 'protractor';
 import { Storage } from '@ionic/storage';
@@ -18,7 +18,7 @@ import { Observable } from 'rxjs';
 import { AuthGuardService } from '../auth-guard.service';
 import { map, filter, scan, finalize } from 'rxjs/operators';
 import { Entrada } from '../entrada';
-//import { AlertInput, ViewController } from '@ionic/core';
+import { AlertInput, ViewController } from '@ionic/core';
 import { ModalController } from '@ionic/angular';
 import { ModalSendPointPage } from '../modal-send-point/modal-send-point.page';
 import { Router } from '@angular/router';
@@ -52,15 +52,9 @@ export class MapaPage implements OnInit {
   faListAlt = faListAlt;
 
   mapRef = null;
-  //myLatLng = null;
   myMark = null;
   lat: any;
   lng: any;
-
-  // options: NativeGeocoderOptions = {
-  //   useLocale: true,
-  //   maxResults: 5
-  // };
 
   constructor(
     private geolocation: Geolocation,
@@ -84,6 +78,7 @@ export class MapaPage implements OnInit {
   }
 
   ionViewDidEnter() {
+    
     this.getLocalData().then((value) => {
       console.log('User: ', value);
       if (value == null) {
@@ -102,14 +97,9 @@ export class MapaPage implements OnInit {
     });
   }
   //  ionViewDidLoad() {
-  ngAfterViewInit() {
-  // ngOnInit(): void {
-    
-      
-  }
+  ngAfterViewInit() {}
 
-  ngOnInit() {
-    
+  ngOnInit() {    
     this.platform.ready().then(() => {    
       this.wspontos.getTypes()
       .pipe(

@@ -54,13 +54,13 @@ export class WsPontosService implements OnInit {
     );
   }
 
-  public login(login: string, password: string) {
+  public login(api_key: string, password: string) {
     //let httpParams = new HttpParams();
     //let httpHeaders = new HttpHeaders({'Access-Control-Allow-Origin': '*'});
     //httpParams.append("id",id); 
     //httpParams.append("_id",id); 
     //return this.http.post<Ponto>('http://192.168.1.4:3000/coordinate/', { headers: httpHeaders, params: httpParams });
-    return this.http.post<User>(this.urlBase+`/user/login`, { login, password });
+    return this.http.post<User>(this.urlBase+`/user/api_key`, {api_key, password });
     //this.pontos.find(ponto => ponto.id === id)
   }
 
